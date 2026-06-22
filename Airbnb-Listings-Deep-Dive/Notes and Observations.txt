@@ -1,0 +1,219 @@
+================================================================================
+  AIRBNB LISTINGS DEEP DIVE — NOTES & OBSERVATIONS
+  Last Updated: June 2026
+  Status: In Progress (updated incrementally as project moves forward)
+================================================================================
+
+--------------------------------------------------------------------------------
+  SECTION 1: DATASET OVERVIEW
+--------------------------------------------------------------------------------
+
+  Source File   : ../data/airnb.csv
+  Total Rows    : 953 listings
+  Initial Cols  : 7 (all stored as raw strings)
+  Final Cols    : 42 (after feature extraction + data cleaning)
+
+  Original 7 Columns:
+    1. Title                  — Listing name (e.g., "Cabin in Hancock, New York, US")
+    2. Detail                 — Short description / tagline of the property
+    3. Date                   — Date range of availability (e.g., "Jun 11 - 16")
+    4. Price(in dollar)       — Listed price as a string (e.g., "306.00")
+    5. Offer price(in dollar) — Discounted price, mostly missing (only 166/953 non-null)
+    6. Review and rating      — Combined string (e.g., "4.85 (531)" or "New")
+    7. Number of bed          — Bed info as string (e.g., "4 beds", "1 queen bed")
+
+  Data Quality Issues Found:
+    - Offer price(in dollar): 787 missing values → 82.58% missing
+    - Review and rating     :   6 missing values →  0.63% missing
+    - Bedroom_Count         : Only 43/953 non-null after regex extraction
+                              (most Detail values too short to contain bedroom info)
+    - Start_Day, End_Day,
+      Duration_Nights,
+      Price_Per_Night       : 65 missing (888 non-null) — likely malformed date strings
+    - Duplicate rows        : 34 (3.57% of total)
+
+--------------------------------------------------------------------------------
+  SECTION 2: COLUMN EXPANSION PIPELINE  (7 → 29 → 42)
+--------------------------------------------------------------------------------
+
+  STEP 1 — Raw Load: 7 columns
+  STEP 2 — Feature Extraction (feature_extraction.py): +22 columns → 29 total
+  STEP 3 — Data Cleaning & Derivation (data_cleaning.py): +13 columns → 42 total
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │  COLUMN DERIVATION TREE                                                 │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+  df (Raw Dataset: 7 columns)
+  ├── Title (Original)
+  │   ├── Property_Type ───────── (via extract_property_type)  → splits on " in ", takes prefix
+  │   ├── City ────────────────── (via extract_city)           → first part after " in ", split by ","
+  │   ├── State ───────────────── (via extract_state)          → second-to-last comma-separated part
+  │   └── Country ─────────────── (via extract_country)        → last comma-separated part
+  │
+  ├── Detail (Original)
+  │   │
+  │   │  [Amenity Flags — Boolean]
+  │   ├── Has_Hot_Tub ─────────── (regex: 'hot\s*tub|jacuzzi')
+  │   ├── Has_Sauna ───────────── (regex: 'sauna')
+  │   ├── Has_Pool ────────────── (regex: 'pool' but NOT 'pool table')
+  │   ├── Has_BBQ ─────────────── (regex: 'bbq|grill|barbecue')
+  │   ├── Has_Fireplace ───────── (regex: 'fireplace|fire\s*place|fire\s*pit')
+  │   ├── Has_Parking ─────────── (regex: 'parking|garage')
+  │   ├── Has_Spa ─────────────── (regex: '\bspa\b')
+  │   │
+  │   │  [Location Flags — Boolean]
+  │   ├── Has_Waterfront ──────── (regex: 'waterfront|lakefront|oceanfront|...')
+  │   ├── Is_Near_Beach ───────── (regex: 'beach|ocean|surf|seaside|coast|shore')
+  │   ├── Is_Mountain ─────────── (regex: 'mountain|hilltop|highland|summit|alpine|ridge')
+  │   ├── Is_Rural ────────────── (regex: 'rural|farm|countryside|wilderness|secluded|...')
+  │   ├── Is_Urban ────────────── (regex: 'downtown|city\s+center|urban|metro|highrise|...')
+  │   │
+  │   │  [Property Classification]
+  │   ├── Property_Subtype ────── (ordered regex match: Treehouse > A-Frame > Dome > Yurt
+  │   │                            > Hut > Tiny Home > Villa > Cottage > Cabin > Suite
+  │   │                            > Studio > Loft > Bungalow > Penthouse > Other)
+  │   ├── Theme ───────────────── (weighted keyword scoring → best-matching theme wins:
+  │   │                            Luxury | Nature | Romantic | Adventure |
+  │   │                            Beach | Family | Historic | Urban | General)
+  │   │
+  │   │  [Text Metrics]
+  │   ├── Detail_Word_Count ───── (len(detail.split()))
+  │   ├── Detail_Char_Count ───── (len(detail))
+  │   ├── Has_Promo ───────────── (regex: 'promo|discount|\d+%\s*off|sale|special offer')
+  │   └── Bedroom_Count ───────── (regex: '(\d+)\s*(br|bedroom|bed room)', sanity 1–20)
+  │
+  ├── Date (Original)
+  │   ├── Month ───────────────── (via extract_start_month → full month name e.g. "June")
+  │   ├── Start_Day ───────────── (via extract_start_day  → e.g. "Jun 11 - 16" → 11)
+  │   ├── End_Day ─────────────── (via extract_end_day    → e.g. "Jun 11 - 16" → 16)
+  │   └── Duration_Nights ─────── (End_Day - Start_Day, only when > 0)
+  │                           │
+  ├── Price(in dollar)        │
+  │   └── Price (float) ──────┼──── Price_Per_Night = Price / Duration_Nights
+  │       │                   │
+  │       └───────────────────┼──── Discount_Pct = ((Price - Offer_Price) / Price) * 100
+  │                           │
+  ├── Offer price(in dollar)  │
+  │   └── Offer_Price (float)─┘
+  │
+  ├── Review and rating (Original)
+  │   ├── Rating ──────────────── (regex: first numeric group, e.g., "4.85" from "4.85 (531)")
+  │   ├── Review_Count ────────── (regex: number inside parentheses, e.g., 531)
+  │   └── Is_New_Listing ──────── (True if raw string == "New", else False)
+  │
+  └── Number of bed (Original)
+      ├── Bed_Count ───────────── (regex: first number, e.g., "1 queen bed" → 1, sanity 1–50)
+      └── Bed_Type ────────────── (keyword match: King|Queen|Single|Double|Twin|Bunk|
+                                   Sofa|Futon → Capitalized; generic "X beds" → "Standard")
+
+--------------------------------------------------------------------------------
+  SECTION 3: FEATURE EXTRACTION NOTES  (feature_extraction.py)
+--------------------------------------------------------------------------------
+
+  Method: All extractors use regex pattern matching with re.IGNORECASE flag.
+
+  A. Title Extractors (4 columns)
+     - Split strategy: "Property_Type in City, State, Country"
+     - Country detection works well for US-based listings but Country = "Unknown"
+       for many international listings where format varies (251 unknowns found)
+
+  B. Amenity Flags (7 columns)
+     - All are simple boolean flags using _safe_search() helper
+     - Pool flag specifically excludes "pool table" to avoid false positives
+     - Spa uses word boundary \b to avoid matching words like "hispania"
+
+  C. Location Flags (5 columns)
+     - Flags can overlap (e.g., a listing can be both Is_Near_Beach and Has_Waterfront)
+     - Is_Rural uses a broad set of terms including "off-grid", "remote", "retreat"
+
+  D. Property Sub-type (1 column, categorical)
+     - Rules ordered from most-specific to least-specific to prevent mis-classification
+     - Falls back to "Other" if none of the 14 defined subtypes match
+
+  E. Theme Classifier (1 column, categorical)
+     - Weighted scoring system — each keyword has a weight (1–3)
+     - Theme with highest total score wins; ties go to whichever appears first in dict
+     - Falls back to "General" if no keywords match at all
+
+  F. Text Metrics (4 columns)
+     - Detail_Word_Count and Detail_Char_Count useful for identifying sparse descriptions
+     - Bedroom_Count has very low fill rate (43/953) because most Detail text is short
+       (just a tagline, not a full property description)
+     - Has_Promo is a broad signal; may require further validation
+
+--------------------------------------------------------------------------------
+  SECTION 4: DATA CLEANING NOTES  (data_cleaning.py)
+--------------------------------------------------------------------------------
+
+  A. Price Cleaning
+     - Strips all non-numeric characters (currency symbols, commas) via regex
+     - Returns None for unparseable values rather than raising errors
+
+  B. Review / Rating Parsing
+     - Input format: "4.85 (531)" → Rating: 4.85, Review_Count: 531
+     - "New" listings → Rating: None, Review_Count: 0, Is_New_Listing: True
+     - Sanity check: rating must be between 0 and 5
+
+  C. Bed Parsing
+     - Bed_Count: extracts first integer from string (with sanity check 1–50)
+     - Bed_Type: checks for specific bed keywords first (King, Queen, Single, etc.)
+       before falling back to "Standard" for generic "X beds" entries
+
+  D. Date Parsing
+     - Input format: "Jun 11 - 16" → Month: "June", Start_Day: 11, End_Day: 16, Duration: 5
+     - Month crossover edge case (e.g., "Jan 29 - 3") returns None for Duration_Nights
+       because correct duration is ambiguous without a full year context
+
+  E. Derived Columns
+     - Discount_Pct: Only computed when both Price and Offer_Price are present and Price > 0
+     - Price_Per_Night: Only computed when Price and Duration_Nights are both valid
+
+--------------------------------------------------------------------------------
+  SECTION 5: KEY STATISTICS FROM INITIAL EXPLORATION
+--------------------------------------------------------------------------------
+
+  Unique Value Counts (raw columns):
+    Title                 : 756 unique  (out of 953 → 197 duplicated titles)
+    Detail                : 839 unique
+    Date                  : 204 unique date ranges
+    Price(in dollar)      : 322 unique prices
+    Offer price(in dollar): 108 unique offer prices
+    Review and rating     : 754 unique
+    Number of bed         :  33 unique bed configurations
+
+  Country Distribution (Top 10 after extraction):
+    Unknown        : 251  (format mismatch or missing location data)
+    US             : 115
+    Indonesia      : 110
+    Thailand       :  69
+    Canada         :  44
+    Mexico         :  40
+    Philippines    :  37
+    Italy          :  34
+    UK             :  34
+    Malaysia       :  26
+
+  Final Column Count by Stage:
+    After load_data()          :  7 columns
+    After extract_all_features():  29 columns  (+22)
+    After clean_all_columns()  :  42 columns  (+13)
+
+--------------------------------------------------------------------------------
+  SECTION 6: THINGS TO INVESTIGATE / TODO
+--------------------------------------------------------------------------------
+
+  [ ] Why do 251 listings have Country = "Unknown"?
+      → Possibly international listings with non-standard Title formats
+  [ ] Bedroom_Count is only 43/953 non-null — consider parsing from Title or other fields
+  [ ] Theme classification overlap: multiple themes could score equally well
+      → Consider returning top-2 themes or a confidence score
+  [ ] Is_Rural and Is_Urban could co-occur if a listing has both keywords
+      → Validate mutual exclusivity or allow multi-label
+  [ ] Explore price distribution: are the high prices outliers or premium listings?
+  [ ] Date parsing drops ~65 rows — investigate malformed date formats
+  [ ] Has_Promo flag might have false positives (e.g., percentage in addresses)
+
+================================================================================
+  END OF NOTES
+================================================================================
