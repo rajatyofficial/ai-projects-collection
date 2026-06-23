@@ -9,8 +9,9 @@ Provides:
   2. save_analysis_df() / load_analysis_df() — persist the cleaned DataFrame
      to a .parquet file so the full pipeline doesn't need to re-run every time.
 
-  3. (Future) Univariate, bivariate, and multivariate analysis functions
-     that operate on the cleaned DataFrame returned by prepare_analysis_df().
+  3. Univariate, bivariate, and multivariate analysis functions that operate
+     on the cleaned DataFrame returned by prepare_analysis_df() (e.g.,
+     univariate_bar_plot() for visualizing categorical column distributions).
 
 Usage
 -----
@@ -20,7 +21,7 @@ Usage
     from data_loader import load_data
     from feature_extraction import extract_all_features
     from data_cleaning import clean_all_columns
-    from analysis import prepare_analysis_df, save_analysis_df
+    from analysis import prepare_analysis_df, save_analysis_df, univariate_bar_plot
 
     df = load_data()
     df = extract_all_features(df)
@@ -308,6 +309,7 @@ def univariate_bar_plot(df: pd.DataFrame, column: str, top_n: int = 10,
     sns.barplot(
         y=top_values.index,
         x=top_values.values,
+        hue=top_values.index,
         palette=palette,
         legend=False
     )
