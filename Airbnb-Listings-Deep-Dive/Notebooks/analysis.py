@@ -384,6 +384,48 @@ def univariate_pie_plot(df: pd.DataFrame, column: str,
     plt.tight_layout()
     plt.show()
 
+def univariate_violin_plot(df: pd.DataFrame, column: str, 
+                           color: str = "skyblue", figsize: tuple = (10, 6)) -> None:
+    """
+    Print summary statistics and plot the distribution of a numerical column using a violin plot.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The analysis-ready DataFrame.
+    column : str
+        Name of the numerical column to plot.
+    color : str, optional
+        Color for the violin plot. Defaults to "skyblue".
+    figsize : tuple, optional
+        Figure size as (width, height). Defaults to (10, 6).
+    """
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")
+
+    # Print summary statistics
+    print("=" * 60)
+    print(f"Summary Statistics for: {column}")
+    print("=" * 60)
+    print(df[column].describe())
+    print("=" * 60)
+
+    # Plot
+    plt.figure(figsize=figsize)
+    display_name = column.replace("_", " ")
+
+    # Create the violin plot
+    sns.violinplot(x=df[column], color=color, inner="quartile")
+    
+    # Add labels and title
+    plt.xlabel(display_name, fontsize=12)
+    plt.title(f"Distribution of {display_name}", fontsize=14, fontweight="bold")
+    
+    # Remove top and right borders
+    sns.despine()
+    plt.tight_layout()
+    plt.show()
+
 
 
 # =============================================================================
