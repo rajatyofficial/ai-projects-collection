@@ -34,6 +34,8 @@ Usage
 
 import os
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 # =============================================================================
@@ -272,6 +274,62 @@ def parquet_exists(path: str = _PARQUET_PATH) -> bool:
 #   - Distribution plots (histograms, KDE) for numeric columns
 #   - Count plots / bar charts for categorical columns
 #   - Boolean flag frequency summary
+
+def univariate_bar_plot(df: pd.DataFrame, column: str, top_n: int = 10,
+                        palette: str = "viridis", figsize: tuple = (12, 8)) -> None:
+    """
+    Plot the value counts of any categorical column as a horizontal bar chart.
+
+    Shows the top N most frequent values with counts annotated on each bar.
+    Works with any categorical (string/object) column in the DataFrame.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The analysis-ready DataFrame.
+    column : str
+        Name of the categorical column to plot.
+    top_n : int, optional
+        Number of top categories to display. Defaults to 10.
+    palette : str, optional
+        Seaborn color palette name. Defaults to "viridis".
+    figsize : tuple, optional
+        Figure size as (width, height). Defaults to (12, 8).
+    """
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")
+
+    plt.figure(figsize=figsize)
+
+    # Get the top N value counts
+    top_values = df[column].value_counts().nlargest(top_n)
+
+    # Create a horizontal bar plot
+    sns.barplot(
+        y=top_values.index,
+        x=top_values.values,
+        palette=palette,
+        legend=False
+    )
+
+    # Format the column name for display (e.g. Property_Type → Property Type)
+    display_name = column.replace("_", " ")
+
+    # Add labels and title
+    plt.xlabel("Count", fontsize=12)
+    plt.ylabel(display_name, fontsize=12)
+    plt.title(f"Top {top_n} — {display_name}", fontsize=14, fontweight="bold")
+
+    # Add the count values to the end of each bar (offset = 2% of max)
+    offset = top_values.max() * 0.02
+    for index, value in enumerate(top_values.values):
+        plt.text(value + offset, index, f"{value:,}", va='center', fontsize=10)
+
+    # Remove top and right borders
+    sns.despine()
+    plt.tight_layout()
+    plt.show()
+
 
 
 # =============================================================================
