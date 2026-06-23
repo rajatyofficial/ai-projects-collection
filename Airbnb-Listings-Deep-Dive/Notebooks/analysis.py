@@ -333,6 +333,58 @@ def univariate_bar_plot(df: pd.DataFrame, column: str, top_n: int = 10,
     plt.show()
 
 
+def univariate_pie_plot(df: pd.DataFrame, column: str, 
+                        palette: str = "viridis", figsize: tuple = (8, 8)) -> None:
+    """
+    Plot the proportion of True vs False values of a boolean column as a pie chart.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The analysis-ready DataFrame.
+    column : str
+        Name of the boolean column to plot.
+    palette : str, optional
+        Seaborn color palette name. Defaults to "viridis".
+    figsize : tuple, optional
+        Figure size as (width, height). Defaults to (8, 8).
+    """
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")
+
+    plt.figure(figsize=figsize)
+    
+    # Get value counts
+    counts = df[column].value_counts()
+    
+    # Check if it has more than 2 values (in case a non-boolean is passed)
+    if len(counts) > 2:
+        print(f"Warning: '{column}' has more than 2 unique values. This pie chart might be cluttered.")
+    
+    # Extract colors from the seaborn palette
+    colors = sns.color_palette(palette, len(counts))
+    
+    # Format the column name for display
+    display_name = column.replace("_", " ")
+
+    # Create the pie plot
+    plt.pie(
+        counts.values,
+        labels=[str(idx) for idx in counts.index],
+        colors=colors,
+        autopct='%1.1f%%',
+        startangle=90,
+        textprops={'fontsize': 12},
+        wedgeprops={'edgecolor': 'white', 'linewidth': 2}
+    )
+    
+    # Add title
+    plt.title(f"Proportion of {display_name}", fontsize=14, fontweight="bold")
+    
+    plt.tight_layout()
+    plt.show()
+
+
 
 # =============================================================================
 # BIVARIATE ANALYSIS
