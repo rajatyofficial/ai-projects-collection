@@ -300,6 +300,13 @@ def univariate_bar_plot(df: pd.DataFrame, column: str, top_n: int = 10,
     if column not in df.columns:
         raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")
 
+    # Print summary statistics
+    print("=" * 60)
+    print(f"Summary Statistics for: {column}")
+    print("=" * 60)
+    print(df[column].describe())
+    print("=" * 60)
+    
     plt.figure(figsize=figsize)
 
     # Get the top N value counts
@@ -351,6 +358,13 @@ def univariate_pie_plot(df: pd.DataFrame, column: str,
     """
     if column not in df.columns:
         raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")
+
+    # Print summary statistics
+    print("=" * 60)
+    print(f"Summary Statistics for: {column}")
+    print("=" * 60)
+    print(df[column].describe())
+    print("=" * 60)
 
     plt.figure(figsize=figsize)
     

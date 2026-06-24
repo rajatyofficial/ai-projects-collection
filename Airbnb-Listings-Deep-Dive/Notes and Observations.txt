@@ -200,19 +200,490 @@
     After clean_all_columns()  :  42 columns  (+13)
 
 --------------------------------------------------------------------------------
-  SECTION 6: THINGS TO INVESTIGATE / TODO
+  SECTION 6: UNIVARIATE ANALYSIS RESULTS
 --------------------------------------------------------------------------------
 
-  [ ] Why do 251 listings have Country = "Unknown"?
-      → Possibly international listings with non-standard Title formats
-  [ ] Bedroom_Count is only 43/953 non-null — consider parsing from Title or other fields
-  [ ] Theme classification overlap: multiple themes could score equally well
-      → Consider returning top-2 themes or a confidence score
-  [ ] Is_Rural and Is_Urban could co-occur if a listing has both keywords
-      → Validate mutual exclusivity or allow multi-label
-  [ ] Explore price distribution: are the high prices outliers or premium listings?
-  [ ] Date parsing drops ~65 rows — investigate malformed date formats
-  [ ] Has_Promo flag might have false positives (e.g., percentage in addresses)
+Property_Type (Extracted from Title)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 43
+
+Most frequent  : Home (123 listings)
+
+Top 10 Property Types:
+1. Home           : 123
+2. Apartment      : 119
+3. Cabin          : 116
+4. Condo          :  95
+5. Room           :  83
+6. Villa          :  62
+7. Tiny home      :  42
+8. Treehouse      :  37
+9. Cottage        :  34
+10. Guesthouse     :  26
+
+Observations:
+- The dataset is quite diverse, with 43 distinct property types.
+- Standard residential types (Home, Apartment, Condo, Room) dominate the top
+spots, accounting for roughly 44% of the entire dataset.
+- Notably, experiential and unique stays (Cabin, Tiny home, Treehouse) make up
+a highly significant portion of the top 10, highlighting a strong representation
+of niche travel accommodations.
+
+Property_Subtype (Extracted from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 15
+
+Most frequent  : Other (567 listings)
+
+Top 10 Property Subtypes:
+1. Other          : 567
+2. Cabin          :  84
+3. Villa          :  74
+4. Treehouse      :  35
+5. Studio         :  35
+6. Cottage        :  34
+7. Suite          :  33
+8. Loft           :  19
+9. A-Frame        :  15
+10. Hut            :  14
+
+Observations:
+- "Other" massively dominates this feature, representing almost 60% of all listings (567 out of 953).
+This suggests that our 14 predefined regex categories (e.g., Treehouse, A-Frame, Yurt) don't capture
+the majority of descriptions, or that the Detail text is simply too vague/short for those listings.
+
+Among the successfully identified specific subtypes, "Cabin" (84) and "Villa" (74) are the most popular.
+
+The presence of categories like "Treehouse", "A-Frame", and "Hut" highlights that the regex pipeline
+successfully identifies these highly niche, experiential properties, even if they make up a smaller slice
+of the overall market.
+
+City (Extracted from Title)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 592
+
+Most frequent  : Kissimmee (16 listings)
+
+Top 10 Cities:
+1. Kissimmee          : 16
+2. Ubud               : 15
+3. Kecamatan Ubud     : 15
+4. New York           : 10
+5. Los Angeles        : 10
+6. Miami              : 8
+7. Miami Beach        : 7
+8. Cancún             : 7
+9. Tampaksiring       : 7
+10. Kuala Lumpur       : 7
+
+Observations:
+- Extremely high cardinality: 592 unique cities across 953 listings indicates a highly distributed, global dataset rather than one concentrated in a few major hubs.
+- Kissimmee is the top location, which aligns with its status as a massive vacation rental hotspot just outside of Orlando/Disney World.
+- The Ubud region in Bali (including Ubud, Kecamatan Ubud, and nearby Tampaksiring) shows a very strong cluster of 37 combined listings, pointing to a high density of properties in Southeast Asian tourist destinations.
+- Major metropolitan areas like New York and Los Angeles are present, but they represent a surprisingly small fraction of the overall dataset, suggesting the data may heavily skew toward vacation, resort, and getaway towns.
+
+State (Extracted from Title)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 32
+
+Most frequent  : Unknown (828 listings)
+
+Top 10 States:
+1. Unknown            : 828
+2. Florida            : 28
+3. California         : 24
+4. Hawaii             : 7
+5. North Carolina     : 6
+6. Washington         : 5
+7. New York           : 5
+8. Texas              : 5
+9. Vermont            : 4
+10. Georgia            : 3
+
+Observations:
+- "Unknown" makes up an overwhelming majority (~87%) of the values in this column. This likely points to a limitation in the extraction pipeline where it struggled to isolate state names if the title format deviated from a standard "City, State, Country" string (which is very common for international listings).
+- The successfully extracted states are overwhelmingly US-based, showing a heavy tilt toward major vacation markets like Florida, California, and Hawaii.
+- Given the exceptionally high rate of "Unknown" values, the State column may have limited utility for predictive modeling or deep geographical analysis unless the extraction logic is heavily refined or combined directly with the City and Country data.
+
+Country (Extracted from Title)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 37
+
+Most frequent  : Unknown (251 listings)
+
+Top 10 Countries:
+1. Unknown            : 251
+2. US                 : 115
+3. Indonesia          : 110
+4. Thailand           : 69
+5. Canada             : 44
+6. Mexico             : 40
+7. Philippines        : 37
+8. Italy              : 34
+9. UK                 : 34
+10. Malaysia           : 26
+
+Observations:
+- "Unknown" accounts for about 26% of the listings (251 out of 953). While still the top category, this is a massive improvement over the State column, indicating that many international listings format their title location as "City, Country" rather than including a state or province.
+
+The dataset has a strong international presence spanning 37 unique countries. While the US is the top successfully identified country, Indonesia is a very close second (115 vs 110).
+
+Southeast Asia represents a surprisingly large portion of this dataset. When combining Indonesia, Thailand, Philippines, and Malaysia, they account for 242 listings, highlighting a significant regional focus or sampling bias toward Asian tourist hotspots.
+
+Theme (Derived from Detail Keyword Scoring)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 9
+
+Most frequent  : General (324 listings)
+
+Theme Distribution:
+1. General            : 324
+2. Beach              : 208
+3. Nature             : 182
+4. Luxury             : 89
+5. Romantic           : 54
+6. Urban              : 34
+7. Adventure          : 30
+8. Historic           : 20
+9. Family             : 12
+
+Observations:
+- "General" captures about 34% of the dataset, indicating that a third of the listings lacked strong enough keywords in their short descriptions to trigger a specific thematic category.
+- "Beach" and "Nature" are the dominant specific themes, combining for nearly 41% of all listings (390). This aligns perfectly with the earlier geographical observations showing high densities in coastal regions and tropical destinations (like Bali, Thailand, and Florida).
+- "Urban" is quite low (34 listings), which corroborates the City-level finding that major metropolitan stays are a minor component of this dataset compared to getaway destinations.
+- "Family" is the lowest-ranking theme (12 listings). This suggests the listings are either marketed more heavily toward couples ("Romantic"), solo travelers, and luxury escapes, or that the Detail text simply does not frequently use family-oriented keywords.
+
+Bed_Type (Extracted from Number of bed)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 7
+
+Most frequent  : Standard (552 listings)
+
+Bed Type Distribution:
+1. Standard           : 552
+2. Queen              : 163
+3. King               : 110
+4. Double             : 91
+5. Sofa               : 23
+6. Single             : 11
+7. Bunk               : 3
+
+Observations:
+- "Standard" dominates the dataset, making up almost 58% of the listings. As noted in the data cleaning pipeline, this serves as the fallback for generic entries like "2 beds" where a specific bed size isn't explicitly mentioned.
+- Among the specified bed sizes, larger beds designed for couples (Queen and King) are by far the most popular, combining for 273 listings.
+- Smaller or family-oriented bed configurations (Single, Bunk) are exceptionally rare in this dataset (only 14 listings combined). This perfectly correlates with the earlier observation that the "Family" theme is the least common, reinforcing the idea that these properties cater more heavily to couples, adult groups, or solo travelers rather than large families with children.
+
+Month (Extracted from Date)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 9
+
+Most frequent  : June (463 listings)
+
+Month Distribution:
+1. June               : 463
+2. May                : 252
+3. July               : 104
+4. September          : 44
+5. August             : 44
+6. October            : 30
+7. November           : 13
+8. December           : 2
+9. January            : 1
+
+Observations:
+- There is a massive concentration of availability in the early summer months. June alone accounts for almost 49% of all listings, and combined with May, they represent about 75% of the entire dataset.
+- This heavily skewed temporal distribution strongly suggests that the dataset was likely scraped or sampled in late Spring (likely May), capturing immediate short-term availability rather than a balanced full-year view.
+- The complete absence of February, March, and April, along with the negligible presence of Winter months (December, January), reinforces that this is a point-in-time snapshot of upcoming bookings.
+- The spike in summer availability aligns well with the earlier findings that "Beach" and "Nature" are the top themes, as these are primarily warm-weather vacation destinations.
+
+Is_New_Listing (Parsed from Review and rating)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (937 listings)
+
+Is_New_Listing Distribution:
+1. False              : 937 (98.3%)
+2. True               : 16  (1.7%)
+
+Observations:
+- The dataset is extremely imbalanced regarding listing maturity. Over 98% of the properties in this dataset are established listings with existing reviews.
+- Only 16 listings (1.7%) are flagged explicitly as "New" properties on the platform.
+- This low turnover/new entry rate indicates that the insights and models derived from this dataset will highly reflect established, mature market dynamics and pricing strategies, rather than an influx of fresh properties.
+
+Has_Hot_Tub (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (919 listings)
+
+Has_Hot_Tub Distribution:
+1. False              : 919 (96.4%)
+2. True               : 34  (3.6%)
+
+Observations:
+- Explicit mentions of a hot tub or jacuzzi in the Detail tagline are quite rare, occurring in only 3.6% of the listings (34 total).
+
+This suggests one of two things: either hot tubs are a highly premium and relatively uncommon amenity across these global getaway locations, or hosts simply prioritize other descriptors over "hot tub" in the short text strings we scraped.
+
+Given the high volume of "Cabin", "Nature", and "Luxury" properties observed in earlier features, properties that do possess this amenity could use it as a strong differentiator to stand out in the dataset.
+
+Has_Sauna (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (945 listings)
+
+Has_Sauna Distribution:
+1. False              : 945 (99.2%)
+2. True               : 8   (0.8%)
+
+Observations:
+- Explicit mentions of a sauna in the short Detail text are exceptionally rare, appearing in less than 1% of listings (only 8 out of 953).
+
+Much like the Has_Hot_Tub feature, this extreme sparsity implies that a sauna is either an ultra-luxury amenity, restricted to very specific niche/cold-weather properties, or simply not prioritized in brief promotional text by hosts.
+
+Properties that do highlight a sauna represent a highly exclusive niche within this dataset.
+
+Has_Pool (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (835 listings)
+
+Has_Pool Distribution:
+1. False              : 835 (87.6%)
+2. True               : 118 (12.4%)
+
+Observations:
+- Compared to saunas (0.8%) and hot tubs (3.6%), a pool is a significantly more common luxury amenity mentioned in the short description, appearing in 12.4% (118) of the listings.
+- This moderately strong presence aligns well with the high ranking of "Villa" as a property type and "Beach"/"Luxury" as themes, which are categories often associated with private or shared pools.
+- However, the vast majority (nearly 88%) of listings still do not advertise a pool in their Detail string, making it a valuable differentiator for the properties that do.
+
+Has_BBQ (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (947 listings)
+
+Has_BBQ Distribution:
+1. False              : 947 (99.4%)
+2. True               : 6   (0.6%)
+
+Observations:
+- Explicit mentions of a BBQ or grill in the short Detail string are incredibly rare, showing up in only 6 listings (0.6% of the dataset).
+
+Given the high prevalence of "Home", "Cabin", and "Nature" stays, it is highly likely that many more properties actually possess a BBQ. The extreme sparsity here points strictly to a limitation of the text extraction source: hosts almost never use their limited promotional tagline to highlight a grill.
+
+As a feature, Has_BBQ will likely be too sparse to carry strong predictive power on its own.
+
+Has_Fireplace (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (948 listings)
+
+Has_Fireplace Distribution:
+1. False              : 948 (99.5%)
+2. True               : 5   (0.5%)
+
+Observations:
+- With only 5 true instances (0.5%), explicit mentions of a fireplace are virtually nonexistent in this dataset.
+- This is likely driven by two compounding factors: first, as seen with BBQ and Sauna, hosts rarely sacrifice limited space in their short promotional tagline to list standard amenities.
+- Second, our earlier geographic and temporal analyses showed a heavy concentration of properties in tropical climates (Bali, Thailand, Florida) and during the summer months (May, June). Fireplaces are simply not a relevant selling point for the vast majority of the listings captured in this specific data pull.
+
+Has_Parking (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (939 listings)
+
+Has_Parking Distribution:
+1. False              : 939 (98.5%)
+2. True               : 14  (1.5%)
+
+Observations:
+- Only 1.5% of listings (14 total) explicitly mention parking or a garage in their short description snippet.
+- Given that standard residential properties like "Home", "Villa", and "Cabin" represent a massive chunk of this dataset, it is almost certain that many more of these properties actually offer parking.
+- Once again, this low occurrence highlights a limitation of relying strictly on promotional taglines for feature extraction; standard/expected amenities like parking are routinely omitted by hosts in favor of advertising more luxurious differentiators.
+
+Has_Spa (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (950 listings)
+
+Has_Spa Distribution:
+1. False              : 950 (99.7%)
+2. True               : 3   (0.3%)
+
+Observations:
+- Similar to features like Has_Fireplace and Has_BBQ, explicit mentions of a "spa" in the Detail column are exceptionally rare, found in only 3 out of 953 listings (0.3%).
+
+This further cements the conclusion that binary amenity flags derived solely from brief promotional text will naturally suffer from extreme sparsity.
+
+While these 3 properties likely fall into the ultra-luxury or resort categories, the feature itself will offer very little variance for predictive modeling purposes across the broader dataset.
+
+Has_Waterfront (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (876 listings)
+
+Has_Waterfront Distribution:
+1. False              : 876 (91.9%)
+2. True               : 77  (8.1%)
+
+Observations:
+- 8.1% of properties explicitly market themselves as waterfront locations in their short descriptions.
+- Unlike the ultra-rare amenity flags (like Spa, BBQ, or Fireplace), a waterfront location is clearly considered a top-tier selling point that hosts prioritize in their limited promotional text.
+- This moderately strong presence (77 listings) perfectly correlates with the high prevalence of the "Beach" and "Nature" themes, as well as the dominance of coastal and island regions (like Florida, Hawaii, and Indonesia) seen in the geographic features.
+
+Is_Near_Beach (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (757 listings)
+
+Is_Near_Beach Distribution:
+1. False              : 757 (79.4%)
+2. True               : 196 (20.6%)
+
+Observations:
+- Nearly 21% of the dataset properties mention being near a beach, ocean, or coast in their short descriptions.
+- This figure (196 listings) aligns almost perfectly with the "Beach" category found in the Theme breakdown (208 listings), validating both extraction approaches and confirming a significant coastal concentration in this dataset.
+
+Compared to Has_Waterfront (8.1%), Is_Near_Beach is much more common. This makes intuitive sense, as many coastal vacation rentals are within walking distance to a beach without sitting directly on the waterfront property line.
+
+Is_Mountain (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (929 listings)
+
+Is_Mountain Distribution:
+1. False              : 929 (97.5%)
+2. True               : 24  (2.5%)
+
+Observations:
+- Only 2.5% of listings (24 total) explicitly mention being in or near mountains.
+- This provides a stark contrast to the Is_Near_Beach feature (20.6%). It reinforces the dataset's heavy bias toward coastal and tropical summer destinations over alpine or ski resort locations.
+
+Although "Cabin" and "Nature" were popular property types and themes, this remarkably low mountain flag suggests those properties are far more likely situated in forests, lakesides, or rural coastal areas rather than high-altitude mountain environments.
+
+Is_Rural (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (889 listings)
+
+Is_Rural Distribution:
+1. False              : 889 (93.3%)
+2. True               : 64  (6.7%)
+
+Observations:
+- Approximately 6.7% of listings explicitly highlight a rural, countryside, remote, or secluded setting in their short description.
+- This is notably higher than the mountain flag (2.5%) but much lower than the beach flag (20.6%).
+- Given that "Nature" is the second most popular theme (182 listings), this relatively modest "rural" percentage suggests hosts are more likely to market the specific natural feature (e.g., lakefront, beach) or the experiential property type (e.g., Treehouse, Cabin) rather than simply labeling the location as "rural".
+
+Is_Urban (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (944 listings)
+
+Is_Urban Distribution:
+1. False              : 944 (99.1%)
+2. True               : 9   (0.9%)
+
+Observations:
+- Less than 1% of the dataset (just 9 listings) explicitly mentions being in an urban, downtown, or city center environment in the short description.
+- This perfectly aligns with our earlier theme analysis where "Urban" was one of the lowest-ranking categories (only 34 listings), as well as the city breakdown which showed major metropolitan hubs (like New York or Los Angeles) making up a very small minority of the properties.
+- This firmly solidifies the conclusion that this specific Airbnb dataset is overwhelmingly composed of non-urban, getaway, vacation, and nature/beach retreat properties, heavily undersampling traditional city apartments.
+
+Has_Promo (Parsed from Detail)
+
+Total non-null : 953 (100% fill rate)
+
+Unique values  : 2
+
+Most frequent  : False (943 listings)
+
+Has_Promo Distribution:
+1. False              : 943 (99.0%)
+2. True               : 10  (1.0%)
+
+Observations:
+- Only 1.0% of the dataset (10 listings) explicitly mentions a promotion, discount, sale, or special offer in the short description text.
+- This strongly indicates that hosts rely heavily on Airbnb's built-in pricing mechanics (like strike-through pricing or system-generated special offer badges) to convey deals to users, rather than using valuable characters in their custom tagline.
+- Given this extreme sparsity, relying on the text-based Has_Promo flag alone will be insufficient for modeling actual discounted properties; combining this with the quantitative Offer_Price feature will be essential.
+
+Price
+
+Total non-null : 953 (100% fill rate)
+
+Mean           : 171.36
+
+Std            : 141.66
+
+Min            : 16.00
+
+25%            : 83.00
+
+50%            : 135.00
+
+75%            : 221.00
+
+Max            : 1463.00
+
+Observations:
+- The pricing data shows a significant right-skew, with the mean ($171.36) being noticeably higher than the median ($135.00).
+- The range is vast, from an extremely budget-friendly $16 to a high-end luxury price of $1,463, indicating a very wide spectrum of property tiers in the dataset.
+- The interquartile range (IQR) spans from $83 to $221, meaning the bulk of the listings (50%) are clustered within this roughly $140 spread.
+- Given the presence of extreme outliers (max $1,463), models predicting Price will need to carefully consider data transformation (e.g., log-transformation) or robust regression techniques to avoid being overly influenced by these top-tier luxury listings.
+
 
 ================================================================================
   END OF NOTES
