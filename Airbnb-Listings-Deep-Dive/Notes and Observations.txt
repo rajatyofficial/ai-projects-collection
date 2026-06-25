@@ -684,7 +684,103 @@ Observations:
 - The interquartile range (IQR) spans from $83 to $221, meaning the bulk of the listings (50%) are clustered within this roughly $140 spread.
 - Given the presence of extreme outliers (max $1,463), models predicting Price will need to carefully consider data transformation (e.g., log-transformation) or robust regression techniques to avoid being overly influenced by these top-tier luxury listings.
 
+Standard Price Analysis
 
+Observations:
+
+Visual Confirmation of Severe Skewness: The violin plot provides a stark visual representation of the right-skewed nature of the pricing data. The massive "belly" (the widest part of the plot representing the highest density of listings) is tightly packed on the left side, indicating that the vast majority of properties are budget-to-mid-range.
+
+The Core Market (IQR): The three vertical dotted lines within the violin plot correspond directly to your summary statistics for the 25th percentile ($83), 50th percentile/median ($135), and 75th percentile ($221). The thickest density falls precisely between the first and third lines, confirming the core competitive market for this dataset lies roughly between $80 and $250 per night.
+
+The "Long Tail" of Luxury Properties: The plot features a very long, extremely thin tail stretching out towards the maximum value of $1,463. This visually confirms that while ultra-luxury or large capacity properties exist in this dataset, they are exceedingly rare outliers.
+
+Mean vs. Median Dynamics: The visual weight of this long tail perfectly explains the discrepancy in your statistics where the mean ($171.36) is pulled almost $36 higher than the median ($135.00). The average is artificially inflated by these few high-priced outliers, making the median a much more accurate baseline for a "typical" property price in this dataset.
+
+Critical Modeling Implications: The dramatic shape of this violin plot—a severe bulge on the left and a long, thin tail on the right—is a classic indicator of non-normal distribution. For any future predictive modeling (such as training an algorithm to predict price based on features like 'Has_Pool' or 'Is_Near_Beach'), applying a transformation to the target variable (like taking the Logarithm of Price) will be absolutely essential. Without this, a regression model will be heavily biased by the extreme outliers in the tail.
+
+Offer Price Analysis
+
+Observations:
+
+Sparsity and Availability: The most critical observation here is the count: only 166 listings out of the total 953 (roughly 17.4%) actually feature an Offer_Price. This is a stark contrast to the text-extracted Has_Promo flag from the earlier analysis (which only captured 10 listings). This numerical column is a far more reliable indicator of active platform discounts.
+
+Visual Shape and Skewness: Much like the standard Price distribution, the Offer Price violin plot exhibits a severe right skew. The standard deviation ($152.87) is nearly identical to the mean ($156.56), which is a mathematical hallmark of a heavily skewed distribution driven by a few high-value outliers.
+
+A Cheaper Core Market: Predictably, the active discounts shift the core market downward. The "belly" of this violin plot is visibly lower. The interquartile range (IQR) for listings with offers sits between $63.75 and $182.00, compared to the $83 to $221 range for standard prices. The median drops from $135 to $119.
+
+The Diminished Luxury Tail: While a long tail still exists, it is truncated compared to the standard price. The maximum offer price is $1,089 (versus $1,463 for standard price). This suggests that while luxury properties do participate in discounting, the ultra-premium tier is slightly less likely to heavily slash prices, or their discounted rates still don't quite reach the absolute maximums of the standard rate.
+
+Feature Engineering Opportunity: Because Offer_Price is null for over 80% of the dataset, it cannot be used directly as a continuous feature in a standard regression model without significant imputation. However, creating a new binary feature (e.g., Is_Discounted) based on the presence or absence of an Offer_Price could be a highly valuable predictor for modeling occupancy, click-through rates, or listing popularity.
+
+Discount Percentage Analysis
+
+Observations:
+
+Extreme Left Skew & Data Anomalies: The visual shape is striking—a massive, healthy cluster on the right (representing genuine discounts) and a microscopic but incredibly long tail stretching far into the negative side. The minimum value of -2,351% is a massive red flag. A negative discount implies a price increase (where the recorded "Offer Price" is somehow higher than the "Standard Price"). An increase of 2,300% strongly suggests severe data scraping errors, currency conversion mismatches, or a glitch where the standard and offer prices were recorded backward.
+
+The True Median Discount: Because of the extreme negative outliers, the mean (-55.18%) is completely distorted and useless. However, the median (50th percentile) provides the ground truth: 11.45%. For properties with a valid, intended discount, a roughly 11% price reduction represents the standard market practice in this dataset.
+
+The Valid Discount Range: Looking at the positive side of the distribution (the median to the max), valid discounts generally range from 11% up to about 45% (the 75th percentile). The absolute maximum caps at roughly 89.8%, which likely represents extreme clearance or last-minute fire-sale deals.
+
+Data Cleaning Imperative: This feature cannot be used in its current state. The extreme negative values will severely break any analytical or machine learning model. A critical data cleaning step will be required: you must either filter out rows with negative Discount_Pct (treating them as errors/nulls) or investigate those specific 166 rows to see if standard price and offer price were accidentally swapped during extraction.
+
+Price Per Night Analysis
+
+Observations:
+
+Missing Data Revelation: The count for Price_Per_Night is 888, which is lower than the total dataset size of 953. This indicates that for 65 listings, the system could not calculate this metric—likely because the required duration data (e.g., length of stay) was missing or unparseable.
+
+The "Total Trip" vs. "Nightly Rate" Discovery: The median standard Price was $135, but the median Price_Per_Night is only $26.40. This is a massive revelation. It strongly implies that the original Price column actually represents the total cost of a multi-night stay (averaging around 5 nights: 135 / 26.4), rather than a base nightly rate. This makes Price_Per_Night the true standardized metric for comparing listing affordability across the dataset.
+
+Highly Budget-Friendly Core: When standardized to a per-night basis, the dataset appears exceptionally affordable. The interquartile range (IQR) reveals that the middle 50% of the listings cost between just $16.40 and $43.65 per night. This budget-heavy distribution perfectly aligns with the earlier findings that Southeast Asian destinations (like Bali/Indonesia, Thailand, Malaysia) make up a massive portion of the dataset.
+
+Consistent Right-Skewed Shape: Despite the lower overall values, the distribution shape remains remarkably consistent with the other price metrics. It features a heavy cluster at the low end and a very long, thin tail extending to a maximum of $292.60 per night. The mean ($33.48) is appropriately pulled higher than the median ($26.40) by these luxury outliers.
+
+Modeling Recommendation: Because the original Price column likely contains blended data (some nightly rates, some total trip costs depending on how the user searched), Price_Per_Night should absolutely be used as the primary target variable for any regression modeling aiming to predict listing value.
+
+Review Count Analysis
+
+Observations:
+
+Right-Skewed "Power Law" Distribution: The violin plot for Review Count exhibits a classic power-law shape. There is a massive concentration of listings on the left side, indicating that the majority of properties have a modest number of reviews, while a long, thin tail stretches out to the right for highly successful, high-traffic properties.
+
+The Core Experience Level: Based on the dotted quartile lines within the plot, the middle 50% of the market (IQR) falls roughly between 50 and 280 reviews, with the median sitting near 130-150. This is a crucial finding: it corroborates the earlier Is_New_Listing flag analysis. This dataset is not made up of newcomers; it is heavily populated by highly established, mature listings with significant booking histories.
+
+The Veteran Outliers: The tail of the violin plot stretches out past 1,200 reviews. These rare "super-listings" likely represent properties that have been on the platform for many years with incredibly high occupancy rates and turnover.
+
+Rating Analysis
+
+Observations:
+
+Extreme Grade Inflation: The summary statistics reveal the severe top-heavy skew that is notoriously common on short-term rental platforms. The median rating is a staggering 4.89 out of 5.0.
+
+The True "Bottom" of the Market: Because of this inflation, traditional rating scales do not apply. The 25th percentile sits at 4.82. This means that a property with a rating of 4.80—which sounds excellent in a vacuum—is actually in the bottom quarter of this dataset and may be viewed negatively by the platform's algorithm.
+
+A Ceiling Effect: The 75th percentile is 4.96, and the maximum is 5.0. The top 25% of the market is tightly compressed, fighting over mere fractions of a decimal point. This suggests that achieving "Superhost" status or top-tier visibility requires near-perfection.
+
+Missing Data Correlation: The count is 931 out of a total 953 listings. This means 22 listings have no rating. This aligns nearly perfectly with the 16 Is_New_Listing flags found earlier. The missing ratings almost certainly belong to brand new properties that have not yet hosted their first guest.
+
+Modeling Challenge: Because the variance is incredibly small (the Standard Deviation is just 0.137), Rating might struggle to serve as a strong predictive continuous feature for price modeling. There simply isn't enough mathematical spread to strongly differentiate a $50/night property from a $200/night property based solely on their 4.85 vs. 4.95 ratings.
+
+Bed Count Analysis
+
+Observations:
+
+Small-Capacity Dominance: The statistics reveal an incredibly compact core market regarding capacity. The 25th, 50th (median), and 75th percentiles are exactly 1, 2, and 3 beds, respectively. This means a full 75% of the listings in this dataset accommodate small groups, couples, or solo travelers. This perfectly confirms the earlier text analysis where "Romantic" themes were prominent and "Family" themes were at the very bottom.
+
+The "Lumpy" Distribution: Unlike continuous variables like Price, the Bed Count violin plot features distinct "bumps" along the left side. This is characteristic of discrete integer data (properties have 1, 2, or 3 beds, rarely fractions). The densest concentration is visibly shared between 1 and 2 beds.
+
+The Mega-Capacity Outliers: The long, thin tail on the right side stretches to a maximum of 22 beds. These extreme outliers (properties with 10+ beds) are incredibly rare and likely represent specialized accommodations like hostels, massive luxury villas, or multi-unit compounds listed as a single booking.
+
+Duration Nights Analysis
+
+Observations:
+
+The "Smoking Gun" for Scraping Methodology: The violin plot shows a massive, overwhelming concentration exactly at 5.0, with barely visible ripples at 6.0 and 7.0. The statistics confirm this definitively: the 25th, 50th, and 75th percentiles are all exactly 5. This proves the hypothesis from the Price_Per_Night analysis—the data was scraped using a hardcoded search parameter specifically requesting a 5-night stay.
+
+Explaining the Missing Data: The count for Duration_Nights is exactly 888. This perfectly matches the count for Price_Per_Night. The 65 listings missing from the full dataset (953) simply failed to have their dates parsed during the scrape. Because the duration couldn't be confirmed, the script correctly withheld calculating the Price_Per_Night for those 65 properties.
+
+Zero Variance (Modeling Utility): Because the vast majority of this column is locked at exactly 5 (acting as a fixed search parameter rather than a property attribute), it has virtually zero variance (Standard Deviation is only 0.47). Therefore, Duration_Nights should be entirely dropped from any machine learning models. It provides no discriminative power to predict property price, occupancy, or rating.
 ================================================================================
   END OF NOTES
 ================================================================================
