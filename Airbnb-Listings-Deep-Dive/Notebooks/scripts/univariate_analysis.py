@@ -8,13 +8,18 @@ import matplotlib.pyplot as plt
 # =============================================================================
 # UNIVARIATE ANALYSIS
 # =============================================================================
+
+# Global default figure sizes (adjust these to change all plots at once)
+FIGSIZE_STANDARD = (10, 6)
+FIGSIZE_LARGE = (12, 8)
+FIGSIZE_SQUARE = (8, 8)
 # TODO: Add functions for:
 #   - Distribution plots (histograms, KDE) for numeric columns
 #   - Count plots / bar charts for categorical columns
 #   - Boolean flag frequency summary
 
 def univariate_bar_plot(df: pd.DataFrame, column: str, top_n: int = 10,
-                        palette: str = "viridis", figsize: tuple = (12, 8)) -> None:
+                        palette: str = "viridis", figsize: tuple = FIGSIZE_STANDARD) -> None:
     """
     Plot the value counts of any categorical column as a horizontal bar chart.
 
@@ -32,7 +37,7 @@ def univariate_bar_plot(df: pd.DataFrame, column: str, top_n: int = 10,
     palette : str, optional
         Seaborn color palette name. Defaults to "viridis".
     figsize : tuple, optional
-        Figure size as (width, height). Defaults to (12, 8).
+        Figure size as (width, height). Defaults to FIGSIZE_STANDARD.
     """
     if column not in df.columns:
         raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")
@@ -78,7 +83,7 @@ def univariate_bar_plot(df: pd.DataFrame, column: str, top_n: int = 10,
 
 
 def univariate_pie_plot(df: pd.DataFrame, column: str, 
-                        palette: str = "viridis", figsize: tuple = (8, 8)) -> None:
+                        palette: str = "viridis", figsize: tuple = FIGSIZE_SQUARE) -> None:
     """
     Plot the proportion of True vs False values of a boolean column as a pie chart.
 
@@ -91,7 +96,7 @@ def univariate_pie_plot(df: pd.DataFrame, column: str,
     palette : str, optional
         Seaborn color palette name. Defaults to "viridis".
     figsize : tuple, optional
-        Figure size as (width, height). Defaults to (8, 8).
+        Figure size as (width, height). Defaults to FIGSIZE_SQUARE.
     """
     if column not in df.columns:
         raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")
@@ -136,7 +141,7 @@ def univariate_pie_plot(df: pd.DataFrame, column: str,
     plt.show()
 
 def univariate_violin_plot(df: pd.DataFrame, column: str, 
-                           color: str = "skyblue", figsize: tuple = (10, 6)) -> None:
+                           color: str = "skyblue", figsize: tuple = FIGSIZE_STANDARD) -> None:
     """
     Print summary statistics and plot the distribution of a numerical column using a violin plot.
 
@@ -149,7 +154,7 @@ def univariate_violin_plot(df: pd.DataFrame, column: str,
     color : str, optional
         Color for the violin plot. Defaults to "skyblue".
     figsize : tuple, optional
-        Figure size as (width, height). Defaults to (10, 6).
+        Figure size as (width, height). Defaults to FIGSIZE_STANDARD.
     """
     if column not in df.columns:
         raise ValueError(f"Column '{column}' not found in DataFrame. Available: {list(df.columns)}")

@@ -7,6 +7,11 @@ import matplotlib.pyplot as plt
 # BIVARIATE ANALYSIS
 # =============================================================================
 
+# Global default figure sizes (adjust these to change all plots at once)
+FIGSIZE_STANDARD = (10, 6)
+FIGSIZE_LARGE = (12, 8)
+FIGSIZE_WIDE = (10, 5)
+
 
 # ── 1. Numerical vs. Numerical ──────────────────────────────────────────────
 
@@ -15,7 +20,7 @@ def bivariate_scatter(df: pd.DataFrame, x: str, y: str, *,
                       add_regression: bool = True,
                       palette: str = "viridis",
                       alpha: float = 0.6,
-                      figsize: tuple = (12, 8)) -> None:
+                      figsize: tuple = FIGSIZE_STANDARD) -> None:
     """
     Scatter plot of two numerical columns with an optional regression line.
 
@@ -35,7 +40,7 @@ def bivariate_scatter(df: pd.DataFrame, x: str, y: str, *,
     alpha : float, optional
         Point transparency (0 = invisible, 1 = opaque).  Defaults to 0.6.
     figsize : tuple, optional
-        Figure size as (width, height).  Defaults to (12, 8).
+        Figure size as (width, height).  Defaults to FIGSIZE_STANDARD.
     """
     for col in (x, y):
         if col not in df.columns:
@@ -84,7 +89,7 @@ def correlation_heatmap(df: pd.DataFrame, *,
                         method: str = "pearson",
                         cmap: str = "coolwarm",
                         annot_fontsize: int = 9,
-                        figsize: tuple = (14, 10)) -> pd.DataFrame:
+                        figsize: tuple = FIGSIZE_LARGE) -> pd.DataFrame:
     """
     Plot a correlation heatmap for numeric columns and return the matrix.
 
@@ -103,7 +108,7 @@ def correlation_heatmap(df: pd.DataFrame, *,
     annot_fontsize : int, optional
         Font size for the annotation text inside each cell.
     figsize : tuple, optional
-        Figure size.  Defaults to (14, 10).
+        Figure size.  Defaults to FIGSIZE_LARGE.
 
     Returns
     -------
@@ -165,7 +170,7 @@ def bivariate_boxplot(df: pd.DataFrame, cat_col: str, num_col: str, *,
                       top_n: int = 10,
                       order_by_median: bool = True,
                       palette: str = "viridis",
-                      figsize: tuple = (12, 8)) -> None:
+                      figsize: tuple = FIGSIZE_STANDARD) -> None:
     """
     Box plot of a numerical column split by the top-N groups of a categorical column.
 
@@ -184,7 +189,7 @@ def bivariate_boxplot(df: pd.DataFrame, cat_col: str, num_col: str, *,
     palette : str, optional
         Seaborn colour palette.  Defaults to "viridis".
     figsize : tuple, optional
-        Figure size.  Defaults to (12, 8).
+        Figure size.  Defaults to FIGSIZE_STANDARD.
     """
     for col in (cat_col, num_col):
         if col not in df.columns:
@@ -241,7 +246,7 @@ def bivariate_bar_mean(df: pd.DataFrame, cat_col: str, num_col: str, *,
                        top_n: int = 10,
                        estimator: str = "mean",
                        palette: str = "viridis",
-                       figsize: tuple = (12, 8)) -> None:
+                       figsize: tuple = FIGSIZE_STANDARD) -> None:
     """
     Horizontal bar chart showing the mean (or median) of a numerical column
     for each category, with 95% confidence-interval error bars.
@@ -261,7 +266,7 @@ def bivariate_bar_mean(df: pd.DataFrame, cat_col: str, num_col: str, *,
     palette : str, optional
         Seaborn colour palette.  Defaults to "viridis".
     figsize : tuple, optional
-        Figure size.  Defaults to (12, 8).
+        Figure size.  Defaults to FIGSIZE_STANDARD.
     """
     for col in (cat_col, num_col):
         if col not in df.columns:
@@ -318,7 +323,7 @@ def bivariate_bar_mean(df: pd.DataFrame, cat_col: str, num_col: str, *,
 
 def bivariate_flag_comparison(df: pd.DataFrame, flag_col: str, num_col: str, *,
                               palette: list[str] | None = None,
-                              figsize: tuple = (12, 6)) -> None:
+                              figsize: tuple = FIGSIZE_WIDE) -> None:
     """
     Compare the distribution of a numerical column between True/False
     groups of a boolean flag using side-by-side KDE + box plots.
@@ -337,7 +342,7 @@ def bivariate_flag_comparison(df: pd.DataFrame, flag_col: str, num_col: str, *,
     palette : list[str] or None, optional
         Two colours for [False, True].  Defaults to ["#95a5a6", "#e74c3c"].
     figsize : tuple, optional
-        Figure size.  Defaults to (12, 6).
+        Figure size.  Defaults to FIGSIZE_WIDE.
     """
     for col in (flag_col, num_col):
         if col not in df.columns:
@@ -409,7 +414,7 @@ def categorical_crosstab_heatmap(df: pd.DataFrame, row_col: str, col_col: str, *
                                   top_n_col: int = 10,
                                   normalize: str = "row",
                                   cmap: str = "YlOrRd",
-                                  figsize: tuple = (14, 8)) -> pd.DataFrame:
+                                  figsize: tuple = FIGSIZE_LARGE) -> pd.DataFrame:
     """
     Heatmap of a cross-tabulation between two categorical columns.
 
@@ -429,7 +434,7 @@ def categorical_crosstab_heatmap(df: pd.DataFrame, row_col: str, col_col: str, *
     cmap : str, optional
         Matplotlib colourmap.  Defaults to "YlOrRd".
     figsize : tuple, optional
-        Figure size.  Defaults to (14, 8).
+        Figure size.  Defaults to FIGSIZE_LARGE.
 
     Returns
     -------
@@ -496,7 +501,7 @@ def bivariate_stacked_bar(df: pd.DataFrame, primary_col: str, secondary_col: str
                           top_n_primary: int = 10,
                           top_n_secondary: int = 6,
                           palette: str = "Set2",
-                          figsize: tuple = (14, 8)) -> None:
+                          figsize: tuple = FIGSIZE_LARGE) -> None:
     """
     100% stacked horizontal bar chart showing the composition of a
     secondary categorical column within each primary category.
@@ -520,7 +525,7 @@ def bivariate_stacked_bar(df: pd.DataFrame, primary_col: str, secondary_col: str
     palette : str, optional
         Seaborn colour palette.  Defaults to "Set2".
     figsize : tuple, optional
-        Figure size.  Defaults to (14, 8).
+        Figure size.  Defaults to FIGSIZE_LARGE.
     """
     for col in (primary_col, secondary_col):
         if col not in df.columns:
