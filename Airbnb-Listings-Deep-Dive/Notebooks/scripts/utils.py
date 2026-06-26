@@ -165,8 +165,8 @@ def analysis_overview(df: pd.DataFrame) -> None:
 # PARQUET PERSISTENCE  (save / load the analysis-ready DataFrame)
 # =============================================================================
 
-# Path to the parquet file, relative to this script's location (Notebooks/)
-_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
+# Path to the parquet file, relative to this script's location (Notebooks/scripts/)
+_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'data')
 _PARQUET_FILENAME = 'cleaned_and_processed_data.parquet'
 _PARQUET_PATH = os.path.join(_DATA_DIR, _PARQUET_FILENAME)
 
@@ -181,7 +181,7 @@ def save_analysis_df(df: pd.DataFrame, path: str = _PARQUET_PATH) -> str:
         The cleaned DataFrame (output of prepare_analysis_df).
     path : str, optional
         Destination file path.  Defaults to
-        ``../data/cleaned_and_processed_data.parquet``.
+        ``../../data/cleaned_and_processed_data.parquet``.
 
     Returns
     -------
@@ -207,7 +207,7 @@ def load_analysis_df(path: str = _PARQUET_PATH) -> pd.DataFrame:
     ----------
     path : str, optional
         Path to the parquet file.  Defaults to
-        ``../data/cleaned_and_processed_data.parquet``.
+        ``../../data/cleaned_and_processed_data.parquet``.
 
     Returns
     -------
