@@ -781,6 +781,26 @@ The "Smoking Gun" for Scraping Methodology: The violin plot shows a massive, ove
 Explaining the Missing Data: The count for Duration_Nights is exactly 888. This perfectly matches the count for Price_Per_Night. The 65 listings missing from the full dataset (953) simply failed to have their dates parsed during the scrape. Because the duration couldn't be confirmed, the script correctly withheld calculating the Price_Per_Night for those 65 properties.
 
 Zero Variance (Modeling Utility): Because the vast majority of this column is locked at exactly 5 (acting as a fixed search parameter rather than a property attribute), it has virtually zero variance (Standard Deviation is only 0.47). Therefore, Duration_Nights should be entirely dropped from any machine learning models. It provides no discriminative power to predict property price, occupancy, or rating.
+
+==============================================================================
+BIVARIATE ANALYSIS
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ================================================================================
   END OF NOTES
 ================================================================================
