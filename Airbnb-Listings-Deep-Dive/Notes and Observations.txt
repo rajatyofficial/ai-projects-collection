@@ -968,20 +968,376 @@ The data paints a picture of an Airbnb ecosystem where experience and specializa
 
 
 
+==================================================================
+MULTIVARIATE ANALYSIS
 
+# Multivariate Analysis Report
 
+## Objective
 
+The multivariate analysis investigates how multiple features interact to influence Airbnb listing price, rating, popularity, and amenities. Unlike univariate and bivariate analysis, this stage focuses on combined effects such as country with theme, property type with amenities, and interactions among multiple numerical variables.
 
+---
 
+# 1. Price and Rating Across Multiple Categories
 
+**Diagram:** *Pivot Heatmap – Median Price by Country × Theme*
 
+### Key Observations
 
+* Property pricing varies significantly across both country and listing theme.
+* Luxury pricing is highly location-dependent rather than universally expensive.
+* The same theme can have completely different price ranges depending on country.
+* Country plays a stronger role in pricing than theme alone.
 
+### Business Knowledge
 
+Pricing strategies should be localized. A global pricing rule based only on listing theme would ignore important regional market differences.
 
+---
 
+**Diagram:** *Pivot Heatmap – Median Rating by Country × Theme*
 
+### Key Observations
 
+* Guest ratings remain consistently high across nearly all country-theme combinations.
+* High prices do not necessarily correspond to higher guest satisfaction.
+* Rating differences between themes are relatively small compared to price differences.
+
+### Business Knowledge
+
+Maintaining service quality appears easier than maintaining consistent pricing. Rating is not a reliable indicator of listing price.
+
+---
+
+**Diagram:** *Pivot Heatmap – Median Price by Property Type × Theme*
+
+### Key Observations
+
+* Property type strongly influences pricing within every theme.
+* Villas, Homes and Treehouses consistently occupy the premium segment.
+* Apartments and Rooms remain the lowest-priced options regardless of theme.
+
+### Business Knowledge
+
+Property type contributes more to pricing than thematic categorization.
+
+---
+
+**Diagram:** *Pivot Heatmap – Median Rating by Property Type × Theme*
+
+### Key Observations
+
+* Ratings are consistently high across all property types.
+* Premium property types do not consistently achieve higher ratings.
+
+### Business Knowledge
+
+Expensive accommodations do not automatically deliver better guest satisfaction.
+
+---
+
+**Diagram:** *Pivot Heatmap – Median Price by Property Type × Country*
+
+### Key Observations
+
+* Large pricing differences exist for identical property types across countries.
+* Villas exhibit the highest pricing variability across regions.
+* Apartments remain relatively affordable in most countries.
+
+### Business Knowledge
+
+Pricing models should account for both property type and geographic location simultaneously.
+
+---
+
+**Diagram:** *Pivot Heatmap – Median Price by Theme × Bed Type*
+
+### Key Observations
+
+* King and Queen beds generally command higher prices.
+* Bed type alone does not explain premium pricing.
+* Theme and accommodation style remain more influential.
+
+### Business Knowledge
+
+Sleeping capacity adds value but cannot independently determine listing price.
+
+---
+
+**Diagram:** *Pivot Heatmap – Mean Review Count by Country × Theme*
+
+### Key Observations
+
+* Popularity differs substantially between countries and themes.
+* Nature and Beach listings often attract large review counts.
+* High popularity does not always coincide with high prices.
+
+### Business Knowledge
+
+Demand patterns vary by market segment and should not be inferred from price alone.
+
+---
+
+# 2. Combined Effect of Amenities
+
+**Diagram:** *Grouped Box Plot – Price by Property Type split by Has_Pool*
+
+### Key Observations
+
+* Pool premiums vary significantly across property types.
+* Cabins and Homes show noticeable price increases when a pool is present.
+* Apartments and Villas do not consistently receive higher prices because of pools.
+
+### Business Knowledge
+
+The value of a pool depends on property type rather than being universally valuable.
+
+---
+
+**Diagram:** *Grouped Box Plot – Price by Property Type split by Is_Near_Beach*
+
+### Key Observations
+
+* Beach proximity substantially increases prices for Condos, Homes and Villas.
+* Some property types receive little or no benefit from beach access.
+
+### Business Knowledge
+
+Location amenities interact strongly with accommodation type.
+
+---
+
+**Diagram:** *Grouped Box Plot – Price by Theme split by Has_Pool*
+
+### Key Observations
+
+* Pool premiums differ across themes.
+* General listings benefit moderately.
+* Luxury and Beach listings do not consistently gain additional value from pools because guests often already expect this feature.
+
+### Business Knowledge
+
+Amenities provide the greatest pricing advantage when they exceed customer expectations.
+
+---
+
+**Diagram:** *Grouped Box Plot – Price by Theme split by Has_Waterfront*
+
+### Key Observations
+
+* Waterfront properties command higher prices, especially within Beach and Nature themes.
+* Waterfront creates one of the strongest location-based premiums.
+
+### Business Knowledge
+
+Natural location advantages remain one of the most valuable pricing drivers.
+
+---
+
+**Diagram:** *Grouped Box Plot – Rating by Theme split by Is_Near_Beach*
+
+### Key Observations
+
+* Ratings remain almost identical regardless of beach proximity.
+* Location improves pricing far more than customer satisfaction.
+
+### Business Knowledge
+
+Guests are willing to pay more for location without necessarily providing higher ratings.
+
+---
+
+**Diagram:** *Grouped Box Plot – Price by Country split by Has_Pool*
+
+### Key Observations
+
+* Pool value differs dramatically across countries.
+* Certain countries exhibit substantial pool premiums while others show minimal impact.
+
+### Business Knowledge
+
+Amenity valuation is market-specific.
+
+---
+
+**Diagram:** *Grouped Box Plot – Price by Property Type split by Has_Hot_Tub*
+
+### Key Observations
+
+* Hot tubs generate large premiums for Cabins, Treehouses and Villas.
+* Minimal effect is observed for Apartments and Rooms.
+
+### Business Knowledge
+
+Luxury amenities are most effective when aligned with the property's overall experience.
+
+---
+
+# 3. Relationship Between Numerical Variables
+
+**Diagram:** *Facet Scatter – Rating vs Price by Property Type*
+
+### Key Observations
+
+* Price and rating show only weak positive relationships across all property types.
+* Increasing price does not guarantee better guest ratings.
+
+### Business Knowledge
+
+Premium pricing should not rely solely on customer ratings.
+
+---
+
+**Diagram:** *Facet Scatter – Rating vs Price by Theme*
+
+### Key Observations
+
+* Luxury, Romantic and Urban themes exhibit slightly stronger positive relationships.
+* Overall correlations remain relatively weak.
+
+### Business Knowledge
+
+Guest satisfaction depends on multiple factors beyond price.
+
+---
+
+**Diagram:** *Facet Scatter – Rating vs Price by Country*
+
+### Key Observations
+
+* Price-rating relationships vary considerably by country.
+* Some countries display almost no correlation.
+
+### Business Knowledge
+
+Customer perception differs between regional markets.
+
+---
+
+**Diagram:** *Facet Scatter – Price vs Bed Count by Theme*
+
+### Key Observations
+
+* Luxury listings show the strongest relationship between bed count and price.
+* Nature listings exhibit almost no relationship.
+* Romantic listings even display a slight negative relationship.
+
+### Business Knowledge
+
+Additional capacity only increases value in certain market segments.
+
+---
+
+**Diagram:** *Facet Scatter – Price vs Review Count by Property Type*
+
+### Key Observations
+
+* Review count has almost no meaningful relationship with price.
+* Popular listings are not necessarily expensive listings.
+
+### Business Knowledge
+
+Popularity and revenue represent different business objectives.
+
+---
+
+# 4. Overall Feature Relationships
+
+**Diagram:** *Pairplot – Price, Rating, Review Count and Bed Count coloured by Theme*
+
+### Key Observations
+
+* Beach and Luxury themes generally occupy higher price ranges.
+* Nature listings attract comparatively high review counts.
+* Ratings remain concentrated near the upper end across every theme.
+
+### Business Knowledge
+
+Themes differentiate pricing and popularity much more than guest ratings.
+
+---
+
+**Diagram:** *Pairplot – Price, Rating, Review Count and Bed Count coloured by Property Type*
+
+### Key Observations
+
+* Homes and Villas dominate the premium pricing segment.
+* Apartments and Rooms occupy the affordable segment.
+* Property types form distinct clusters in feature space.
+
+### Business Knowledge
+
+Property type is one of the strongest segmentation variables.
+
+---
+
+**Diagram:** *Pairplot – Price, Rating, Review Count and Bed Count coloured by Country*
+
+### Key Observations
+
+* Countries occupy different pricing and popularity distributions.
+* Regional markets display distinct customer behaviour.
+
+### Business Knowledge
+
+Country-specific strategies are more appropriate than universal pricing policies.
+
+---
+
+# 5. Amenity Profiles
+
+**Diagram:** *Amenity Profile – Theme × Amenities*
+
+### Key Observations
+
+* Beach listings are predominantly located near beaches and frequently feature waterfront access.
+* Luxury listings contain the highest proportion of pools.
+* Nature listings are associated with rural and mountainous locations.
+
+### Business Knowledge
+
+Themes accurately reflect physical characteristics of listings rather than acting as arbitrary labels.
+
+---
+
+**Diagram:** *Amenity Profile – Property Type × Amenities*
+
+### Key Observations
+
+* Villas have the highest pool availability.
+* Cabins frequently include hot tubs and rural settings.
+* Condos are commonly located near beaches.
+
+### Business Knowledge
+
+Property types naturally specialize in different amenity combinations.
+
+---
+
+**Diagram:** *Amenity Profile – Country × Amenities*
+
+### Key Observations
+
+* Amenity distributions differ substantially between countries.
+* Indonesia and Thailand have the highest proportion of pools.
+* Canada contains the largest proportion of rural listings.
+* The US has relatively high availability of hot tubs and waterfront properties.
+
+### Business Knowledge
+
+Regional geography strongly influences amenity availability and should be incorporated into recommendation and pricing models.
+
+---
+
+# Overall Conclusions
+
+* Property type and country are the strongest determinants of listing price.
+* Amenities such as pools, waterfront access and hot tubs create value only within specific property types, themes and regions.
+* Guest ratings remain consistently high and show only weak relationships with pricing.
+* Popularity (review count) is largely independent of price, indicating that expensive listings are not necessarily the most booked.
+* Listing themes effectively capture distinct location and amenity characteristics, making them valuable features for pricing and recommendation models.
+* Pricing decisions should be based on interactions between multiple variables rather than any single feature.
 
 
 
