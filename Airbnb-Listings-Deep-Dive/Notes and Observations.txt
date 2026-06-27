@@ -786,6 +786,194 @@ Zero Variance (Modeling Utility): Because the vast majority of this column is lo
 BIVARIATE ANALYSIS
 
 
+Bivariate Analysis Report: Airbnb Listings Deep Dive
+===================================================
+
+This report summarizes the insights gathered from the bivariate analysis on the Airbnb listings dataset. It answers key business questions by exploring correlations, comparing distributions across categories, and analyzing cross-tabulations.
+
+---------------------------------------------------
+1. Correlations & Continuous Variables
+---------------------------------------------------
+- Q: Do more expensive listings guarantee better guest ratings?
+  A: No. There is a very weak positive correlation (r = +0.1803) between Price and Rating. Paying a premium does not strongly guarantee a better rating.
+
+- Q: Are highly reviewed (popular) listings more expensive, or do budget listings attract the most bookings?
+  A: They are virtually uncorrelated (r = -0.0515). Highly reviewed listings are not distinctly more or less expensive than average.
+
+- Q: Does the number of beds strongly predict the listing price?
+  A: There is a moderate positive correlation (r = +0.2649). While having more beds tends to increase the price, the relationship is not overly strong.
+
+- Q: Is there a value-for-money pattern — do cheaper-per-night listings get rated worse, or is quality independent of nightly rate?
+  A: Quality is largely independent of the nightly rate. The correlation between Price_Per_Night and Rating is very weak (r = +0.1753).
+
+- Q: Do highly rated listings accumulate more reviews over time, or do volume and quality move independently?
+  A: Volume and quality move independently. The correlation between Rating and Review_Count is almost non-existent (r = +0.0349).
+
+- Q: Do hosts who write longer, more descriptive taglines tend to charge higher prices?
+  A: No, there is no significant correlation (r = +0.0638) between description length (Detail_Word_Count) and Price.
+
+- Q: Do longer-stay listings offer a lower per-night rate (bulk discount effect)?
+  A: There is a very weak negative correlation (r = -0.1220). This suggests a slight bulk discount effect, but it's not a strong rule.
+
+---------------------------------------------------
+2. Categorical vs. Numeric (Box Plots & Bar Charts)
+---------------------------------------------------
+- Q: Which thematic category commands the highest nightly premium?
+  A: The "Beach" theme commands the highest premium, with a median price of $162 and a mean of $211.70.
+
+- Q: Are certain themes consistently rated higher by guests?
+  A: "Family" and "Historic" themes have the highest median guest ratings (4.940).
+
+- Q: Which property types are the most expensive? Are niche types priced higher than standard ones?
+  A: "Villa" ($219 median) and "Treehouse" ($207 median) are the most expensive. Niche properties definitely command a premium over standard types like "Apartment" ($90 median).
+
+- Q: Which property types receive the best guest satisfaction scores?
+  A: "Tiny home" (4.945 median) and "Cabin" (4.930 median) receive the best ratings.
+
+- Q: How do listing prices vary across the top countries? Are Southeast Asian markets significantly cheaper?
+  A: Yes. The US has the highest median price ($221). Southeast Asian markets are significantly cheaper: Thailand ($65), Philippines ($62), and Malaysia ($52.5).
+
+- Q: Do certain countries consistently produce higher-rated listings?
+  A: The UK leads with a median rating of 4.955, but most top countries boast excellent median ratings ranging between 4.79 and 4.95.
+
+- Q: Do listings with King or Queen beds charge a premium over Standard?
+  A: "Queen" beds ($146 median) and "Standard" beds ($140 median) are relatively similar, while "King" beds have a lower median ($126.5) but higher variability.
+
+- Q: Does bed quality correlate with ratings?
+  A: "King" beds have a slightly higher median rating (4.910) than "Standard" (4.895) and "Queen" (4.875).
+
+- Q: Is there a seasonal pricing pattern? Are June listings priced differently from September/October?
+  A: Yes, June (median $100) is priced notably lower than months like May ($175.5), August ($175.5), and September ($177.5). 
+
+- Q: Does the per-night rate shift with the month of availability?
+  A: Yes, September ($34.5 median) and May ($34.7 median) have higher nightly rates compared to June ($20.0 median).
+
+- Q: Which themes attract the most reviews?
+  A: "Urban" (mean 309.7) and "Nature" (mean 226.4) attract the highest number of reviews.
+
+- Q: Which property types have the highest average review counts?
+  A: "Guesthouse" (mean 335.3) and "Tiny home" (mean 247.2).
+
+- Q: Are listings in certain countries reviewed far more heavily?
+  A: The US (mean 241.6 reviews) and Malaysia (mean 230.4 reviews) see heavy review volumes.
+
+- Q: Do certain themes tend to have larger properties (more beds)?
+  A: Yes, "Family" (mean 2.75 beds) and "Beach" (mean 2.39 beds) themes tend to feature larger properties.
+
+- Q: Which property types offer the most sleeping capacity?
+  A: "Villa" (mean 3.3 beds) and "Home" (mean 2.6 beds).
+
+- Q: Which countries have the highest mean nightly rate?
+  A: The US ($49.17) and Indonesia ($41.68).
+
+- Q: Do some themes have systematically longer promotional descriptions?
+  A: Yes, "Family" (mean 7.33 words) and "Adventure" (mean 7.23 words) tend to have longer descriptions compared to "General" (mean 5.74).
+
+---------------------------------------------------
+3. Flag Comparisons (Yes/No Attributes)
+---------------------------------------------------
+- Q: How much of a price premium does a pool add?
+  A: Listings with pools actually have a slightly lower median price (-$4.00, or -3.0%), though their average (mean) price is higher due to expensive outliers.
+
+- Q: Do pool properties actually get better guest ratings?
+  A: No, the ratings are virtually identical (median difference -0.03).
+
+- Q: What's the beach proximity premium?
+  A: There is a massive premium: +$58.00 (+46.8%) on the median price.
+
+- Q: Do beach-adjacent properties earn higher guest satisfaction?
+  A: They earn slightly lower satisfaction (median difference -0.02).
+
+- Q: How much more do waterfront properties charge?
+  A: A significant premium of +$53.00 (+40.5%) on the median price.
+
+- Q: Are waterfront properties rated higher than non-waterfront?
+  A: No, ratings are identical.
+
+- Q: How large is the hot-tub premium?
+  A: It is substantial: +$112.00 (+84.8%) on the median price.
+
+- Q: Are rural/secluded getaways cheaper or more expensive than the rest?
+  A: They are slightly more expensive (median difference +$2.00, +1.5%).
+
+- Q: Do rural properties receive higher ratings?
+  A: Yes, they receive slightly higher ratings (median difference +0.04, +0.8%).
+
+- Q: Mountain listings — premium or budget?
+  A: Premium. They charge +$27.00 (+20.3%) more at the median.
+
+- Q: Do brand-new listings price themselves lower to attract initial bookings?
+  A: No, they are priced substantially higher (median difference +$97.00, +72.4%).
+
+- Q: Do beach properties accumulate more reviews?
+  A: No, they have slightly fewer reviews (median difference -14.5).
+
+- Q: Are pool properties more frequently booked (more reviews)?
+  A: No, they have significantly fewer reviews (median difference -39.5).
+
+---------------------------------------------------
+4. Categorical Breakdowns & Compositions
+---------------------------------------------------
+- Q: Which property types dominate each theme? Are Cabins mostly "Nature"? Are Apartments mostly "Urban"?
+  A: Yes. 49.3% of "Nature" listings are Cabins. 39.1% of "Urban" listings are Apartments.
+
+- Q: Are King beds concentrated in "Romantic" / "Luxury" themes? Are Bunk beds more common in "Family" listings?
+  A: King beds are indeed concentrated in "Romantic" (20.4%) and "Family" (25%) themes. Bunk beds are surprisingly absent (0%) in the "Family" theme sample.
+
+- Q: Do certain countries skew toward specific themes?
+  A: Yes. Thailand is highly skewed toward "Beach" (39.1%). Canada heavily leans toward "Nature" (38.6%). Italy is dominated by "General" (73.5%).
+
+- Q: What bed configurations are typical for each property type?
+  A: Standard beds dominate universally. "Queen" beds are very popular in "Tiny homes" (33.3%) and "Cottages" (26.5%). "King" beds are common in "Villas" (21.0%).
+
+- Q: What's the thematic composition of each property type?
+  A: "Treehouses" are almost exclusively "Nature" (83.8%). "Villas" are split mainly between "Beach" (33.9%) and "Luxury" (22.6%).
+
+- Q: Do certain themes dominate specific months?
+  A: "Nature" completely dominates January (100%), while "General" and "Romantic" split December evenly. The busy summer months (June/July) showcase a wide spread of themes, with "General", "Beach", and "Nature" leading.
+
+---------------------------------------------------
+5. Deep Logical Analysis & Strategic Takeaways
+---------------------------------------------------
+
+Based on the bivariate distributions and correlation matrices explored above, we can distill several core strategic insights regarding listing performance, pricing dynamics, and market segmentation.
+
+### A. The Drivers of Pricing Power
+When we look at the correlation heatmap, it is striking how few fundamental numeric features strongly predict price. 
+![Correlation Heatmap](images/cell_2_plot.png)
+
+While `Bed_Count` offers a moderate positive correlation (r = +0.2649), it is not the primary driver of high nightly rates. Instead, the real pricing power lies in *qualitative features and locational amenities*. 
+For example, proximity to the beach completely transforms the pricing tier of a property:
+![Beach Proximity Premium](images/cell_29_plot.png)
+Properties near the beach see a massive +46.8% premium on median price, and those with a hot tub see an astonishing +84.8% premium. This suggests that hosts aiming to maximize revenue should focus less on raw capacity (adding beds) and more on experiential amenities (hot tubs, beachfront access) which command disproportionate premiums.
+
+### B. The "Quality vs. Price" Disconnect
+A common assumption in hospitality is that you "get what you pay for" — meaning higher prices should correlate with better experiences and higher ratings. The data strongly refutes this.
+![Price vs Rating](images/cell_3_plot.png)
+The scatter plot of Price vs. Rating shows a very weak relationship (r = +0.1803). Guests rating budget properties (e.g., Tiny homes, which have the highest median rating of 4.945) are just as satisfied, if not more so, than those booking Luxury Villas. This implies that Airbnb ratings are highly relative to guest expectations rather than absolute quality. A perfectly executed budget stay will consistently out-rate a mediocre luxury stay.
+
+### C. Market Segmentation and Thematic Alignment
+The cross-tabulation and composition charts reveal that successful property types are highly specialized for specific themes, rather than being "one size fits all".
+![Theme by Property Type](images/cell_44_plot.png)
+As seen in the composition chart:
+- **Treehouses** and **Cabins** are almost entirely dedicated to the "Nature" theme.
+- **Villas** are heavily skewed toward "Beach" and "Luxury".
+- **Apartments** dominate the "Urban" theme.
+
+This indicates a mature, segmented market. A host entering the market shouldn't just build a "house"; they need to align the property type tightly with a thematic expectation (e.g., if buying a Cabin, market it for Nature/Adventure; if buying a Villa, position it for Luxury/Beach). Misaligned properties (e.g., an Urban Cabin) may struggle to find their audience and command a premium.
+
+### Conclusion
+The data paints a picture of an Airbnb ecosystem where experience and specialization reign supreme over raw utility. Premium pricing is achieved through targeted amenities (hot tubs, waterfronts) and thematic cohesion, while high guest satisfaction can be achieved at any price point by simply exceeding the specific expectations set by the property's niche.
+
+
+
+
+
+
+
+
+
+
 
 
 
