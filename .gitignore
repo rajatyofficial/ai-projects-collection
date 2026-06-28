@@ -10,3 +10,6 @@ ENV/
 
 # Airbnb listings data directory
 Airbnb-Listings-Deep-Dive/data/
+
+# Compressed output images directory
+
