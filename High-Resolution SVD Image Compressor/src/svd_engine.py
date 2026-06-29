@@ -42,70 +42,16 @@ NOTEBOOK TEST (after completing this file):
 
 import numpy as np
 
-
-# ==============================================================================
-# STEP 1.1: POWER ITERATION
-# ==============================================================================
-# 
-# WHAT IT DOES:
-#     Given a square matrix M, finds the DOMINANT (largest) eigenvalue
-#     and its corresponding eigenvector.
-#
-# THE ALGORITHM (in plain English):
-#     1. Start with a random vector b (same size as M's columns)
-#     2. Multiply: b_new = M · b         (matrix-vector multiplication)
-#     3. Normalize: b = b_new / ||b_new|| (divide by its length so it doesn't explode)
-#     4. Repeat steps 2-3 many times (e.g., 100 iterations)
-#     5. After convergence, b IS the dominant eigenvector
-#     6. The eigenvalue = bᵀ · M · b     (called the Rayleigh quotient)
-#
-# WHY IT WORKS:
-#     When you repeatedly multiply by M, the component along the largest
-#     eigenvector gets amplified the most. After enough iterations, the
-#     random vector becomes dominated by that component.
-#
-# PARAMETERS:
-#     M              : numpy 2D array — a SQUARE symmetric matrix (e.g., AᵀA or AAᵀ)
-#     num_iterations : int — how many times to repeat (default 100, more = more accurate)
-#
-# RETURNS:
-#     eigenvalue  : float — the dominant (largest) eigenvalue of M
-#     eigenvector : numpy 1D array — the unit vector corresponding to that eigenvalue
-#
-# HINTS:
-#     - Use np.random.rand() to create the initial random vector
-#     - Use np.dot() for matrix-vector multiplication
-#     - Use np.linalg.norm() for computing the vector's length (for normalization)
-#     - The Rayleigh quotient formula: eigenvalue = (bᵀ · M · b) / (bᵀ · b)
-#       But since b is normalized (||b|| = 1), this simplifies to: eigenvalue = bᵀ · M · b
-#
-# EXAMPLE:
-#     >>> M = np.array([[4, 1], [1, 3]])
-#     >>> eigenvalue, eigenvector = power_iteration(M, num_iterations=100)
-#     >>> print(eigenvalue)     # Should be close to 4.618 (dominant eigenvalue)
-#     >>> print(eigenvector)    # Should be close to [0.851, 0.526]
-#
 def power_iteration(M, num_iterations=100):
     """Find the dominant eigenvalue and eigenvector using Power Iteration."""
-    
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Get the size of the matrix (number of rows or columns, since it's square)
-    # HINT: n = M.shape[0]
-    
-    # Step 2: Generate a random starting vector of size n
-    # HINT: b = np.random.rand(n)
-    
-    # Step 3: Loop for num_iterations times:
-    #     a) Multiply: b_new = np.dot(M, b)
-    #     b) Normalize: b = b_new / np.linalg.norm(b_new)
-    
-    # Step 4: Compute the eigenvalue using the Rayleigh quotient
-    # HINT: eigenvalue = np.dot(b.T, np.dot(M, b))
-    
-    # Step 5: Return (eigenvalue, b) — the eigenvalue and the eigenvector
-    
-    pass  # ← Remove this once you write your code
+
+    n = M.shape[0]
+    b = np.random.rand(n)
+    for _ in range(num_iterations):
+        b_new = np.dot(M,b)
+        b = b_new / np.linalg.norm(b_new)
+    eigenvalue = np.dot(b.T,np.dot(M,b))
+    return eigenvalue,b
 
 
 # ==============================================================================
