@@ -53,54 +53,12 @@ def power_iteration(M, num_iterations=100):
     eigenvalue = np.dot(b.T,np.dot(M,b))
     return eigenvalue,b
 
-
-# ==============================================================================
-# STEP 1.2: DEFLATION
-# ==============================================================================
-#
-# WHAT IT DOES:
-#     After finding the dominant eigenvector, we "subtract" its influence
-#     from the matrix so we can find the NEXT largest eigenvalue.
-#
-# THE MATH:
-#     M_deflated = M - eigenvalue * (eigenvector · eigenvectorᵀ)
-#     
-#     This creates the "outer product" of the eigenvector with itself,
-#     scales it by the eigenvalue, and subtracts it from M.
-#     The result is a new matrix where the dominant eigenvalue is now ZERO,
-#     so running Power Iteration again gives us the SECOND largest.
-#
-# PARAMETERS:
-#     M           : numpy 2D array — the original square symmetric matrix
-#     eigenvector : numpy 1D array — the dominant eigenvector (from power_iteration)
-#     eigenvalue  : float — the dominant eigenvalue (from power_iteration)
-#
-# RETURNS:
-#     M_deflated : numpy 2D array — the matrix with the dominant component removed
-#
-# HINTS:
-#     - The outer product of a vector v with itself: np.outer(v, v)
-#     - This gives a matrix where entry (i,j) = v[i] * v[j]
-#
-# EXAMPLE:
-#     >>> eigenvalue, eigenvector = power_iteration(M, 100)
-#     >>> M_deflated = deflation(M, eigenvector, eigenvalue)
-#     >>> eigenvalue2, eigenvector2 = power_iteration(M_deflated, 100)
-#     >>> print(eigenvalue2)  # Should be the SECOND largest eigenvalue
-#
 def deflation(M, eigenvector, eigenvalue):
     """Remove the dominant eigencomponent from matrix M."""
-    
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Compute the outer product of eigenvector with itself
-    # HINT: outer = np.outer(eigenvector, eigenvector)
-    
-    # Step 2: Subtract: M_deflated = M - eigenvalue * outer
-    
-    # Step 3: Return M_deflated
-    
-    pass  # ← Remove this once you write your code
+
+    outer = np.outer(eigenvector, eigenvector)
+    M_deflated = M - eigenvalue * outer
+    return M_deflated
 
 
 # ==============================================================================
