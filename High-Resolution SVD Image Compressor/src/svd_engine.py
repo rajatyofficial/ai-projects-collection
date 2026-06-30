@@ -3,8 +3,6 @@
 SVD ENGINE — Phase 1: The Core Math Engine (Custom SVD from Scratch)
 ==============================================================================
 
-This is the HEART of the entire project. Everything else depends on this.
-
 WHAT THIS FILE DOES:
     Implements Singular Value Decomposition (SVD) from scratch using only
     NumPy. No np.linalg.svd allowed here — we build it ourselves.
@@ -30,13 +28,6 @@ BUILD ORDER:
     2. deflation()         — removes that eigenvector's influence
     3. eigen_decompose()   — uses 1 & 2 in a loop to find k eigenvectors
     4. custom_svd()        — uses 3 to compute full SVD
-
-NOTEBOOK TEST (after completing this file):
-    In Notebook.ipynb, Section 1:
-    - Test power_iteration on a 4×4 matrix, watch eigenvalue converge
-    - Test deflation, verify 2nd eigenvalue < 1st
-    - Test custom_svd, compare U, Σ, V with np.linalg.svd output
-    - Test on a 32×32 random matrix (actual block size we'll use later)
 ==============================================================================
 """
 
@@ -72,87 +63,22 @@ def eigen_decompose(M, k, num_iterations=100):
     eigenvalues = np.array(eigenvalues)
     eigenvectors = np.column_stack(eigenvectors)
     return eigenvalues,eigenvectors
-    
 
-# ==============================================================================
-# STEP 1.4: THE SVD WRAPPER — custom_svd(A, k)
-# ==============================================================================
-#
-# WHAT IT DOES:
-#     Computes the rank-k SVD of ANY matrix A (not necessarily square).
-#     Returns U, sigma, Vt such that A ≈ U · diag(sigma) · Vt
-#
-# THE ALGORITHM:
-#     1. Compute AᵀA  (this is a square symmetric matrix)
-#     2. Run eigen_decompose(AᵀA, k) to get:
-#        - eigenvalues (these are σ² — the squared singular values)
-#        - V (the right singular vectors — columns of V)
-#     3. Compute singular values: σ = √eigenvalues
-#     4. Compute U from the formula:  u_i = (A · v_i) / σ_i
-#        (each column of U = A times the corresponding column of V, divided by σ)
-#     5. Return U, sigma, Vᵀ
-#
-# WHY NOT JUST USE AAᵀ FOR U?
-#     We COULD run eigen_decompose(AAᵀ) too, but it's simpler and more
-#     numerically stable to derive U directly from V and σ using the formula above.
-#
-# PARAMETERS:
-#     A : numpy 2D array — the matrix to decompose (any shape, e.g., 32×32 image block)
-#     k : int — the target rank (how many singular values to keep)
-#
-# RETURNS:
-#     U     : numpy 2D array of shape (m, k) — left singular vectors
-#     sigma : numpy 1D array of shape (k,)   — singular values (descending order)
-#     Vt    : numpy 2D array of shape (k, n) — right singular vectors (transposed)
-#
-# EDGE CASES TO HANDLE:
-#     - If an eigenvalue is negative (numerical noise), clamp it to 0 before sqrt
-#       HINT: eigenvalues = np.maximum(eigenvalues, 0)
-#     - If a singular value is ~0, skip computing that column of U (avoid division by zero)
-#       HINT: use a threshold like 1e-10
-#
-# EXAMPLE:
-#     >>> A = np.random.rand(32, 32)            # A 32×32 image block
-#     >>> U, sigma, Vt = custom_svd(A, k=8)     # Keep top 8 singular values
-#     >>> A_compressed = U @ np.diag(sigma) @ Vt # Reconstruct the compressed block
-#     >>> error = np.linalg.norm(A - A_compressed)
-#     >>> print(f"Reconstruction error: {error}")  # Should be small but nonzero
-#
-# NOTEBOOK TEST:
-#     Compare your output with NumPy's built-in:
-#     >>> U_np, s_np, Vt_np = np.linalg.svd(A, full_matrices=False)
-#     >>> print("Our singular values:", sigma)
-#     >>> print("NumPy singular values:", s_np[:k])
-#     They should be very close (within ~0.001)
-#
 def custom_svd(A, k):
     """Compute rank-k SVD decomposition of matrix A from scratch."""
-    
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Compute AᵀA (the covariance-like matrix)
-    # HINT: AtA = np.dot(A.T, A)   — shape will be (n, n)
-    
-    # Step 2: Find the top-k eigenvalues and eigenvectors of AᵀA
-    # HINT: eigenvalues, V = eigen_decompose(AtA, k)
-    # NOTE: V's columns are the right singular vectors
-    
-    # Step 3: Handle numerical noise — clamp negative eigenvalues to 0
-    # HINT: eigenvalues = np.maximum(eigenvalues, 0)
-    
-    # Step 4: Compute singular values (σ = √eigenvalue)
-    # HINT: sigma = np.sqrt(eigenvalues)
-    
-    # Step 5: Compute U (left singular vectors) column by column
-    # Formula: u_i = (A · v_i) / σ_i
-    # HINT: Create an empty matrix U of shape (m, k) where m = A.shape[0]
-    # HINT: Loop over each column i (0 to k-1):
-    #     if sigma[i] > 1e-10:   (avoid division by zero)
-    #         U[:, i] = np.dot(A, V[:, i]) / sigma[i]
-    
-    # Step 6: Compute Vᵀ (transpose of V)
-    # HINT: Vt = V.T
-    
-    # Step 7: Return U, sigma, Vt
-    
-    pass  # ← Remove this once you write your code
+    AtA = np.dot(A.T,A)
+    eigenvalues,V = eigen_decompose(AtA,k)
+    eigenvalues = np.maximum(eigenvalues,0)
+    sigma = np.sqrt(eigenvalues)
+    m,n = A.shape
+    U = np.zeros((m,k))
+    for i in range(k):
+        if sigma[i] > 1e-10:
+            U[:,i] = np.dot(A,V[:,i])/sigma[i]
+    Vt = V.T
+    return U, sigma, Vt
+
+def reconstruct_svd(U,sigma,Vt):
+    """Reconstruct image from SVD components."""
+    return U @ np.diag(sigma) @ Vt
+
