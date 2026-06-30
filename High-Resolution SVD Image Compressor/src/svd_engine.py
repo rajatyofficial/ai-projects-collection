@@ -40,11 +40,11 @@ NOTEBOOK TEST (after completing this file):
 ==============================================================================
 """
 
+# pyrefly: ignore [missing-import]
 import numpy as np
 
 def power_iteration(M, num_iterations=100):
     """Find the dominant eigenvalue and eigenvector using Power Iteration."""
-
     n = M.shape[0]
     b = np.random.rand(n)
     for _ in range(num_iterations):
@@ -55,68 +55,24 @@ def power_iteration(M, num_iterations=100):
 
 def deflation(M, eigenvector, eigenvalue):
     """Remove the dominant eigencomponent from matrix M."""
-
     outer = np.outer(eigenvector, eigenvector)
     M_deflated = M - eigenvalue * outer
     return M_deflated
 
-
-# ==============================================================================
-# STEP 1.3 (HELPER): EIGEN DECOMPOSITION
-# ==============================================================================
-#
-# WHAT IT DOES:
-#     Finds the top-k eigenvalues and eigenvectors of a symmetric matrix
-#     by calling power_iteration and deflation in a loop.
-#
-# THE ALGORITHM:
-#     1. Run power_iteration → get eigenvalue_1, eigenvector_1
-#     2. Run deflation → get M without eigenvalue_1's influence
-#     3. Run power_iteration on deflated M → get eigenvalue_2, eigenvector_2
-#     4. Repeat until we have k eigenvalues and eigenvectors
-#
-# PARAMETERS:
-#     M              : numpy 2D array — a square symmetric matrix
-#     k              : int — how many eigenvalues/eigenvectors to find
-#     num_iterations : int — iterations for each power_iteration call
-#
-# RETURNS:
-#     eigenvalues  : numpy 1D array of shape (k,)  — the top-k eigenvalues (descending)
-#     eigenvectors : numpy 2D array of shape (n, k) — each column is an eigenvector
-#
-# HINTS:
-#     - Start with empty lists for eigenvalues and eigenvectors
-#     - In each loop iteration: find eigenpair → store it → deflate the matrix
-#     - Use np.array() to convert lists to arrays at the end
-#     - Stack eigenvectors as columns: np.column_stack(eigenvector_list)
-#
 def eigen_decompose(M, k, num_iterations=100):
-    """Find the top-k eigenvalues and eigenvectors of a symmetric matrix."""
+    """Find the top-k eigenvalues and eigenvectors of a symmetric matrix."""    
+    eigenvalues = []
+    eigenvectors = []
+    M_current = M.copy()
+    for _ in range(k):
+        eigenvalue,eigenvector = power_iteration(M_current,num_iterations)
+        eigenvalues.append(eigenvalue)
+        eigenvectors.append(eigenvector)
+        M_current = deflation(M_current,eigenvector,eigenvalue)
+    eigenvalues = np.array(eigenvalues)
+    eigenvectors = np.column_stack(eigenvectors)
+    return eigenvalues,eigenvectors
     
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Create empty lists to collect eigenvalues and eigenvectors
-    # HINT: eigenvalues = []
-    # HINT: eigenvectors = []
-    
-    # Step 2: Make a copy of M so we don't modify the original
-    # HINT: M_current = M.copy()
-    
-    # Step 3: Loop k times:
-    #     a) Call power_iteration(M_current, num_iterations)
-    #        → get (eigenvalue, eigenvector)
-    #     b) Append eigenvalue to eigenvalues list
-    #     c) Append eigenvector to eigenvectors list
-    #     d) Call deflation(M_current, eigenvector, eigenvalue)
-    #        → update M_current with the deflated matrix
-    
-    # Step 4: Convert to numpy arrays and return
-    # HINT: eigenvalues = np.array(eigenvalues)
-    # HINT: eigenvectors = np.column_stack(eigenvectors)
-    # HINT: return eigenvalues, eigenvectors
-    
-    pass  # ← Remove this once you write your code
-
 
 # ==============================================================================
 # STEP 1.4: THE SVD WRAPPER — custom_svd(A, k)
