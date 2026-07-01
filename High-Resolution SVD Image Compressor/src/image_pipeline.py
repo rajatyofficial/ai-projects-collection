@@ -54,54 +54,12 @@ def load_image(path:str) -> np.ndarray:
     return image_array
 
 
-
-# ==============================================================================
-# STEP 2.1b: SPLIT CHANNELS
-# ==============================================================================
-#
-# WHAT IT DOES:
-#     Takes an RGB image array (H, W, 3) and splits it into three
-#     separate 2D matrices: one for Red, one for Green, one for Blue.
-#
-# WHY SPLIT?
-#     SVD operates on 2D matrices, not 3D arrays. We need to compress
-#     each color channel independently, then reassemble them at the end.
-#
-# PARAMETERS:
-#     image : numpy 3D array of shape (H, W, 3) — the loaded image
-#
-# RETURNS:
-#     A tuple of three 2D arrays: (red, green, blue)
-#     - red   : numpy 2D array of shape (H, W) — red channel values [0.0, 1.0]
-#     - green : numpy 2D array of shape (H, W) — green channel values [0.0, 1.0]
-#     - blue  : numpy 2D array of shape (H, W) — blue channel values [0.0, 1.0]
-#
-# HINTS:
-#     - NumPy slicing: image[:, :, 0] gives ALL rows, ALL columns, channel 0 (Red)
-#     - Channel indices: 0 = Red, 1 = Green, 2 = Blue
-#
-# EXAMPLE:
-#     >>> img = load_image("samples/sample.jpg")
-#     >>> r, g, b = split_channels(img)
-#     >>> print(r.shape)  # (1080, 1920) — just the red values
-#
-def split_channels(image):
+def split_channels(image:np.ndarray) -> tuple[np.ndarray,np.ndarray,np.ndarray]:
     """Split an RGB image into its three color channels."""
-    
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Extract the Red channel (index 0)
-    # HINT: red = image[:, :, 0]
-    
-    # Step 2: Extract the Green channel (index 1)
-    # HINT: green = image[:, :, 1]
-    
-    # Step 3: Extract the Blue channel (index 2)
-    # HINT: blue = image[:, :, 2]
-    
-    # Step 4: Return as a tuple: (red, green, blue)
-    
-    pass  # ← Remove this once you write your code
+    r = image[:,:,0]
+    g = image[:,:,1]
+    b = image[:,:,2]
+    return r,g,b
 
 
 # ==============================================================================
