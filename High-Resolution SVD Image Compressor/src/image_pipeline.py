@@ -42,70 +42,17 @@ NOTEBOOK TEST (after completing this file):
 ==============================================================================
 """
 
+# pyrefly: ignore [missing-import]
 import numpy as np
 from PIL import Image
 
+def load_image(path:str) -> np.ndarray:
+    """Load an image file and return as a normalized NumPy array.""" 
+    pil_image = Image.open(path).convert("RGB")
+    image_array = np.array(pil_image,dtype=np.float64)
+    image_array /=255.0
+    return image_array
 
-# ==============================================================================
-# STEP 2.1a: LOAD IMAGE
-# ==============================================================================
-#
-# WHAT IT DOES:
-#     Takes a file path to an image (.jpg, .png, etc.) and returns it as
-#     a NumPy array with shape (height, width, 3) and dtype float64.
-#
-# THE ALGORITHM:
-#     1. Open the image file using PIL.Image.open()
-#     2. Convert it to RGB mode (in case it's RGBA, grayscale, etc.)
-#     3. Convert the PIL Image to a NumPy array
-#     4. Convert pixel values from integers (0-255) to floats (0.0-1.0)
-#        by dividing by 255.0
-#
-# WHY CONVERT TO FLOAT?
-#     SVD works with real numbers, not integers. Also, when we reconstruct
-#     the image after compression, values might go slightly below 0 or above 1.
-#     Working in float-space makes the math cleaner.
-#
-# PARAMETERS:
-#     path : str — file path to the image (e.g., "samples/sample.jpg")
-#
-# RETURNS:
-#     image : numpy 3D array of shape (H, W, 3) — normalized to [0.0, 1.0]
-#             H = height in pixels, W = width in pixels, 3 = RGB channels
-#
-# HINTS:
-#     - PIL.Image.open(path) returns a PIL Image object
-#     - .convert("RGB") ensures 3 channels (handles RGBA, grayscale, etc.)
-#     - np.array(pil_image) converts PIL → NumPy
-#     - Divide by 255.0 to normalize to [0, 1]
-#     - Use .astype(np.float64) for precision
-#
-# EXAMPLE:
-#     >>> img = load_image("samples/sample.jpg")
-#     >>> print(img.shape)   # e.g., (1080, 1920, 3)
-#     >>> print(img.dtype)   # float64
-#     >>> print(img.min(), img.max())  # 0.0 ... 1.0
-#
-def load_image(path):
-    """Load an image file and return as a normalized NumPy array."""
-    
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Open the image with PIL
-    # HINT: pil_image = Image.open(path)
-    
-    # Step 2: Convert to RGB (handles RGBA, grayscale, palette modes)
-    # HINT: pil_image = pil_image.convert("RGB")
-    
-    # Step 3: Convert to NumPy array
-    # HINT: image_array = np.array(pil_image, dtype=np.float64)
-    
-    # Step 4: Normalize pixel values from [0, 255] to [0.0, 1.0]
-    # HINT: image_array = image_array / 255.0
-    
-    # Step 5: Return the normalized array
-    
-    pass  # ← Remove this once you write your code
 
 
 # ==============================================================================
