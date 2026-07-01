@@ -61,6 +61,7 @@ def split_channels(image:np.ndarray) -> tuple[np.ndarray,np.ndarray,np.ndarray]:
     b = image[:,:,2]
     return r,g,b
 
+
 def image_to_blocks(matrix, block_size=32):
     """Split a 2D matrix into a list of block_size × block_size sub-matrices."""
     H, W = matrix.shape
@@ -76,6 +77,7 @@ def image_to_blocks(matrix, block_size=32):
             blocks.append(block)
     return blocks,(H_padded,W_padded)
 
+
 def blocks_to_image(blocks, padded_shape, original_shape, block_size=32):
     """Reassemble a list of blocks into a full 2D matrix."""
     matrix = np.zeros(padded_shape)
@@ -89,71 +91,15 @@ def blocks_to_image(blocks, padded_shape, original_shape, block_size=32):
     return matrix[:original_shape[0], :original_shape[1]]
 
 
-# ==============================================================================
-# HELPER: MERGE CHANNELS
-# ==============================================================================
-#
-# WHAT IT DOES:
-#     Takes three separate R, G, B 2D matrices and stacks them back
-#     into a single (H, W, 3) image array ready for saving/display.
-#
-# ALSO:
-#     Clips values to [0.0, 1.0] because SVD reconstruction can produce
-#     values slightly outside this range due to numerical precision.
-#
-# PARAMETERS:
-#     red   : numpy 2D array (H, W)
-#     green : numpy 2D array (H, W)
-#     blue  : numpy 2D array (H, W)
-#
-# RETURNS:
-#     image : numpy 3D array (H, W, 3) — clipped to [0.0, 1.0]
-#
-# HINTS:
-#     - np.stack([red, green, blue], axis=2)  — stacks along the 3rd axis
-#     - np.clip(array, 0.0, 1.0)             — clamps values to range
-#
 def merge_channels(red, green, blue):
     """Merge R, G, B channels back into an RGB image array."""
-    
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Stack the three channels along axis=2
-    # HINT: image = np.stack([red, green, blue], axis=2)
-    
-    # Step 2: Clip values to [0, 1] (SVD can produce values slightly out of range)
-    # HINT: image = np.clip(image, 0.0, 1.0)
-    
-    # Step 3: Return the merged image
-    
-    pass  # ← Remove this once you write your code
+    image = np.stack([red, green, blue], axis=2)
+    image = np.clip(image, 0.0, 1.0)    
+    return image
 
 
-# ==============================================================================
-# HELPER: SAVE IMAGE
-# ==============================================================================
-#
-# WHAT IT DOES:
-#     Takes a float image array [0.0, 1.0] and saves it as a .jpg or .png file.
-#
-# PARAMETERS:
-#     image_array : numpy 3D array (H, W, 3) — float values in [0.0, 1.0]
-#     output_path : str — where to save (e.g., "output/compressed.jpg")
-#
-# HINTS:
-#     - Convert back to uint8: (image_array * 255).astype(np.uint8)
-#     - Use PIL: Image.fromarray(uint8_array).save(output_path)
-#
 def save_image(image_array, output_path):
     """Save a float image array as an image file."""
-    
-    # YOUR CODE BELOW ↓↓↓
-    
-    # Step 1: Convert from float [0, 1] back to uint8 [0, 255]
-    # HINT: uint8_array = (image_array * 255).astype(np.uint8)
-    
-    # Step 2: Create PIL Image and save
-    # HINT: pil_image = Image.fromarray(uint8_array)
-    # HINT: pil_image.save(output_path)
-    
-    pass  # ← Remove this once you write your code
+    uint8_array = (image_array * 255).astype(np.uint8)    
+    pil_image = Image.fromarray(uint8_array)
+    pil_image.save(output_path)
