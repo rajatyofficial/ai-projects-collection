@@ -34,15 +34,22 @@ BUILD ORDER:
 # pyrefly: ignore [missing-import]
 import numpy as np
 
-def power_iteration(M, num_iterations=100):
+def power_iteration(M, num_iterations=100, tol=1e-6):
     """Find the dominant eigenvalue and eigenvector using Power Iteration."""
     n = M.shape[0]
     b = np.random.rand(n)
     for _ in range(num_iterations):
-        b_new = np.dot(M,b)
-        b = b_new / np.linalg.norm(b_new)
-    eigenvalue = np.dot(b.T,np.dot(M,b))
-    return eigenvalue,b
+        b_new = np.dot(M, b)
+        norm = np.linalg.norm(b_new)
+        if norm < 1e-12:
+            break
+        b_new = b_new / norm
+        if np.linalg.norm(b_new - b) < tol:
+            b = b_new
+            break
+        b = b_new
+    eigenvalue = np.dot(b.T, np.dot(M, b))
+    return eigenvalue, b
 
 def deflation(M, eigenvector, eigenvalue):
     """Remove the dominant eigencomponent from matrix M."""
@@ -64,17 +71,20 @@ def eigen_decompose(M, k, num_iterations=100):
     eigenvectors = np.column_stack(eigenvectors)
     return eigenvalues,eigenvectors
 
-def custom_svd(A, k):
+def custom_svd(A, k, use_numpy=False):
     """Compute rank-k SVD decomposition of matrix A from scratch."""
-    AtA = np.dot(A.T,A)
-    eigenvalues,V = eigen_decompose(AtA,k)
-    eigenvalues = np.maximum(eigenvalues,0)
+    if use_numpy:
+        U_full, s_full, Vt_full = np.linalg.svd(A, full_matrices=False)
+        return U_full[:, :k], s_full[:k], Vt_full[:k, :]
+    AtA = np.dot(A.T, A)
+    eigenvalues, V = eigen_decompose(AtA, k)
+    eigenvalues = np.maximum(eigenvalues, 0)
     sigma = np.sqrt(eigenvalues)
-    m,n = A.shape
-    U = np.zeros((m,k))
+    m, n = A.shape
+    U = np.zeros((m, k))
     for i in range(k):
         if sigma[i] > 1e-10:
-            U[:,i] = np.dot(A,V[:,i])/sigma[i]
+            U[:, i] = np.dot(A, V[:, i]) / sigma[i]
     Vt = V.T
     return U, sigma, Vt
 

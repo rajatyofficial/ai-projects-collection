@@ -65,24 +65,39 @@ def calculate_rank(block_size, keep_percentage):
     return k
 
 
-def compress_channel(channel_matrix, block_size, k):
-    """Compress a single color channel using block-based SVD."""
+def compress_channel(channel_matrix, block_size, k, use_numpy=False):
+    """Compress a single color channel using block-based SVD.
 
-    blocks, padded_shape = image_to_blocks(channel_matrix, block_size)
-    original_shape = channel_matrix.shape
-    compressed_blocks = []
+    Processes blocks in-place to minimize memory usage — avoids
+    collecting all blocks into intermediate lists.
+    """
 
-    for i, block in enumerate(blocks):
-        U, sigma, Vt = custom_svd(block, k)
-        compressed_block = U @ np.diag(sigma) @ Vt
-        compressed_blocks.append(compressed_block)
-        if i % 100 == 0:
-            print(f"Processing block {i}/{len(blocks)}", end="\r")
-    compressed_channel = blocks_to_image(compressed_blocks, padded_shape, original_shape, block_size)
-    return compressed_channel
+    H, W = channel_matrix.shape
+    H_padded = H + (block_size - H % block_size) % block_size
+    W_padded = W + (block_size - W % block_size) % block_size
+
+    padded = np.zeros((H_padded, W_padded), dtype=channel_matrix.dtype)
+    padded[:H, :W] = channel_matrix
+
+    result = np.zeros_like(padded)
+    blocks_per_row = W_padded // block_size
+    total_blocks = (H_padded // block_size) * blocks_per_row
+    block_idx = 0
+
+    for row in range(0, H_padded, block_size):
+        for col in range(0, W_padded, block_size):
+            block = padded[row:row+block_size, col:col+block_size]
+            U, sigma, Vt = custom_svd(block, k, use_numpy=use_numpy)
+            result[row:row+block_size, col:col+block_size] = U @ np.diag(sigma) @ Vt
+            if block_idx % 100 == 0:
+                print(f"Processing block {block_idx}/{total_blocks}", end="\r")
+            block_idx += 1
+
+    del padded
+    return result[:H, :W]
 
 
-def compress_image(image_path, keep=20, block_size=32, output_path="output/compressed.jpg"):
+def compress_image(image_path, keep=20, block_size=32, output_path="output/compressed.jpg", quality=65, use_numpy=False):
     """Compress a full RGB image using block-based SVD."""
 
     image = load_image(image_path)
@@ -90,12 +105,14 @@ def compress_image(image_path, keep=20, block_size=32, output_path="output/compr
     k = calculate_rank(block_size, keep)
     print(f"Compressing with rank k={k} (keeping {keep}% of data)")
     print("Compressing Red channel...")
-    red_compressed = compress_channel(red, block_size, k)
+    red_compressed = compress_channel(red, block_size, k, use_numpy=use_numpy)
     print("Compressing Green channel...")
-    green_compressed = compress_channel(green, block_size, k)
+    green_compressed = compress_channel(green, block_size, k, use_numpy=use_numpy)
     print("Compressing Blue channel...")
-    blue_compressed = compress_channel(blue, block_size, k)
+    blue_compressed = compress_channel(blue, block_size, k, use_numpy=use_numpy)
+    del image, red, green, blue
     compressed = merge_channels(red_compressed, green_compressed, blue_compressed)
-    save_image(compressed, output_path)
+    del red_compressed, green_compressed, blue_compressed
+    save_image(compressed, output_path, quality=quality)
     print(f"Saved compressed image to: {output_path}")
     return compressed

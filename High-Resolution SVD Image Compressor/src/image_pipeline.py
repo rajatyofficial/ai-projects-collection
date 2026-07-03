@@ -49,7 +49,7 @@ from PIL import Image
 def load_image(path:str) -> np.ndarray:
     """Load an image file and return as a normalized NumPy array.""" 
     pil_image = Image.open(path).convert("RGB")
-    image_array = np.array(pil_image,dtype=np.float64)
+    image_array = np.array(pil_image, dtype=np.float32)
     image_array /=255.0
     return image_array
 
@@ -98,8 +98,12 @@ def merge_channels(red, green, blue):
     return image
 
 
-def save_image(image_array, output_path):
+def save_image(image_array, output_path, quality=65):
     """Save a float image array as an image file."""
     uint8_array = (image_array * 255).astype(np.uint8)    
     pil_image = Image.fromarray(uint8_array)
-    pil_image.save(output_path)
+    ext = output_path.lower().rsplit('.', 1)[-1]
+    if ext in ('jpg', 'jpeg'):
+        pil_image.save(output_path, quality=quality, optimize=True)
+    else:
+        pil_image.save(output_path)
