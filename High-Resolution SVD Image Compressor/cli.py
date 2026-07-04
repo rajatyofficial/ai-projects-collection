@@ -36,10 +36,10 @@ NOTEBOOK TEST (before building this, test in Notebook.ipynb Section 4):
 import argparse
 import os
 import time
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src'))
 
-# NOTE: Uncomment these imports once you've completed Phases 1-3!
-# from src.compressor import compress_image
-# from src.utils import validate_image_path, validate_percentage, validate_block_size
+from src.compressor import compress_image
 
 
 # ==============================================================================
@@ -80,49 +80,39 @@ import time
 def create_parser():
     """Create and configure the argument parser."""
     
-    # YOUR CODE BELOW ↓↓↓
+    parser = argparse.ArgumentParser(
+        description="High-Resolution SVD Image Compressor — Compress images using custom SVD from scratch"
+    )
     
-    # Step 1: Create the parser with a description
-    # HINT: parser = argparse.ArgumentParser(
-    #           description="High-Resolution SVD Image Compressor — "
-    #                       "Compress images using custom SVD from scratch"
-    #       )
+    parser.add_argument(
+        "--image",
+        type=str,
+        required=True,
+        help="Path to the input image file (e.g., samples/sample.jpg)"
+    )
     
-    # Step 2: Add --image argument (REQUIRED)
-    # HINT: parser.add_argument(
-    #           "--image",
-    #           type=str,
-    #           required=True,
-    #           help="Path to the input image file (e.g., samples/sample.jpg)"
-    #       )
+    parser.add_argument(
+        "--keep",
+        type=float,
+        default=20,
+        help="Percentage of data to keep, 1-100 (default: 20)"
+    )
     
-    # Step 3: Add --keep argument (OPTIONAL, default 20)
-    # HINT: parser.add_argument(
-    #           "--keep",
-    #           type=float,
-    #           default=20,
-    #           help="Percentage of data to keep, 1-100 (default: 20)"
-    #       )
+    parser.add_argument(
+        "--block_size",
+        type=int,
+        default=32,
+        help="Block size for grid processing, must be power of 2 (default: 32)"
+    )
     
-    # Step 4: Add --block_size argument (OPTIONAL, default 32)
-    # HINT: parser.add_argument(
-    #           "--block_size",
-    #           type=int,
-    #           default=32,
-    #           help="Block size for grid processing, must be power of 2 (default: 32)"
-    #       )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="output/compressed.jpg",
+        help="Output file path (default: output/compressed.jpg)"
+    )
     
-    # Step 5: Add --output argument (OPTIONAL)
-    # HINT: parser.add_argument(
-    #           "--output",
-    #           type=str,
-    #           default="output/compressed.jpg",
-    #           help="Output file path (default: output/compressed.jpg)"
-    #       )
-    
-    # Step 6: Return the parser
-    
-    pass  # ← Remove this once you write your code
+    return parser
 
 
 # ==============================================================================
@@ -151,46 +141,33 @@ def create_parser():
 def main():
     """Main CLI entry point."""
     
-    # YOUR CODE BELOW ↓↓↓
+    parser = create_parser()
+    args = parser.parse_args()
     
-    # Step 1: Create parser and parse arguments
-    # HINT: parser = create_parser()
-    # HINT: args = parser.parse_args()
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     
-    # Step 2: Validate inputs
-    # HINT: validate_image_path(args.image)
-    # HINT: validate_percentage(args.keep)
-    # HINT: validate_block_size(args.block_size)
+    print("=" * 60)
+    print("  SVD Image Compressor")
+    print("=" * 60)
+    print(f"  Input:      {args.image}")
+    print(f"  Output:     {args.output}")
+    print(f"  Keep:       {args.keep}%")
+    print(f"  Block size: {args.block_size}×{args.block_size}")
+    print("=" * 60)
     
-    # Step 3: Create output directory if it doesn't exist
-    # HINT: os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    start = time.time()
+    compress_image(args.image, args.keep, args.block_size, args.output)
+    elapsed = time.time() - start
     
-    # Step 4: Print a summary of what we're about to do
-    # HINT: print("=" * 60)
-    # HINT: print("  SVD Image Compressor")
-    # HINT: print("=" * 60)
-    # HINT: print(f"  Input:      {args.image}")
-    # HINT: print(f"  Output:     {args.output}")
-    # HINT: print(f"  Keep:       {args.keep}%")
-    # HINT: print(f"  Block size: {args.block_size}×{args.block_size}")
-    # HINT: print("=" * 60)
+    original_size = os.path.getsize(args.image) / 1024  # KB
+    compressed_size = os.path.getsize(args.output) / 1024  # KB
     
-    # Step 5: Run compression with timing
-    # HINT: start = time.time()
-    # HINT: compress_image(args.image, args.keep, args.block_size, args.output)
-    # HINT: elapsed = time.time() - start
-    
-    # Step 6: Print results
-    # HINT: original_size = os.path.getsize(args.image) / 1024  # KB
-    # HINT: compressed_size = os.path.getsize(args.output) / 1024  # KB
-    # HINT: print(f"\n  Time:        {elapsed:.2f}s")
-    # HINT: print(f"  Original:    {original_size:.1f} KB")
-    # HINT: print(f"  Compressed:  {compressed_size:.1f} KB")
-    # HINT: print(f"  Ratio:       {original_size/compressed_size:.1f}x")
-    # HINT: print("=" * 60)
-    # HINT: print("  Done! ✓")
-    
-    pass  # ← Remove this once you write your code
+    print(f"\n  Time:        {elapsed:.2f}s")
+    print(f"  Original:    {original_size:.1f} KB")
+    print(f"  Compressed:  {compressed_size:.1f} KB")
+    print(f"  Ratio:       {original_size/compressed_size:.1f}x")
+    print("=" * 60)
+    print("  Done! ✓")
 
 
 # ==============================================================================

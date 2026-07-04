@@ -55,6 +55,7 @@ from image_pipeline import (
     merge_channels,
     save_image,
 )
+from utils import progress_bar
 
 
 def calculate_rank(block_size, keep_percentage):
@@ -89,15 +90,15 @@ def compress_channel(channel_matrix, block_size, k, use_numpy=False):
             block = padded[row:row+block_size, col:col+block_size]
             U, sigma, Vt = custom_svd(block, k, use_numpy=use_numpy)
             result[row:row+block_size, col:col+block_size] = U @ np.diag(sigma) @ Vt
-            if block_idx % 100 == 0:
-                print(f"Processing block {block_idx}/{total_blocks}", end="\r")
             block_idx += 1
+            if block_idx % 10 == 0 or block_idx == total_blocks:
+                progress_bar(block_idx, total_blocks, prefix="Compressing blocks")
 
     del padded
     return result[:H, :W]
 
 
-def compress_image(image_path, keep=20, block_size=32, output_path="output/compressed.jpg", quality=65, use_numpy=False):
+def compress_image(image_path, keep=20, block_size=32, output_path="output/compressed.jpg", quality=65, use_numpy=True): # change this to use custom function
     """Compress a full RGB image using block-based SVD."""
 
     image = load_image(image_path)
