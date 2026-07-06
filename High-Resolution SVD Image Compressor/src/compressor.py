@@ -46,8 +46,8 @@ NOTEBOOK TEST (after completing this file):
 # pyrefly: ignore [missing-import]
 import numpy as np
 
-from svd_engine import custom_svd
-from image_pipeline import (
+from src.svd_engine import custom_svd
+from src.image_pipeline import (
     load_image,
     split_channels,
     image_to_blocks,
