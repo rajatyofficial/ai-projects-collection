@@ -11,5 +11,6 @@ ENV/
 # Airbnb listings data directory
 Airbnb-Listings-Deep-Dive/data/
 
-# Compressed output images directory
+# WHO data directory
+WHO Life Expectancy Analysis/data/
 
